@@ -1,0 +1,30 @@
+Type: Project
+Package: palaeoversedash
+Title: Palaeoverse Packages Dashboard
+Version: 0.0.1
+Description: A Quarto dashboard tracking activity, code quality and impact
+    of the Palaeoverse R packages.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+    bsicons,
+    bslib,
+    cranlogs,
+    cyclocomp,
+    dplyr,
+    echarts4r,
+    fs,
+    gh,
+    ggplot2,
+    git2r,
+    httr2,
+    jsonlite,
+    knitr,
+    loc,
+    reactable,
+    rmarkdown,
+    universe
+Remotes:
+    etiennebacher/cyclocomp@speedup,
+    etiennebacher/loc,
+    ropensci/universe

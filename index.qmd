@@ -1,0 +1,262 @@
+---
+title: "Palaeoverse packages dashboard"
+logo: _brand/logos/logo-text.png
+format: dashboard
+
+theme:
+  - cosmo
+  - assets/styles/custom.scss
+  - assets/styles/quarto.scss
+  - brand
+
+execute:
+  echo: false
+---
+
+# Palaeoverse
+
+
+
+```{r}
+#| context: setup
+library(bslib)
+library(dplyr)
+library(ggplot2)
+library(gh)
+library(cranlogs)
+library(reactable)
+library(echarts4r)
+
+source("stats.R")
+```
+
+
+```{r}
+#| context: setup
+pkg <- "palaeoverse"
+
+all_stats <- universe::universe_one_package("palaeoverse", pkg)
+
+# n_downloads <- get_number_of_downloads(pkg)
+# n_stars <- all_stats[["_stars"]]
+# n_forks <- get_number_of_forks(pkg)
+# n_prs <- get_number_of_prs(pkg, state = "all")
+# n_contributors <- all_stats[["_contributors"]]
+# last_release <- get_number_of_weeks_since_last_release(pkg)
+
+n_downloads <- 1
+n_stars <- 1
+n_forks <- 1
+n_prs <- 1
+n_citations <- 1
+n_revdep <- 1
+n_contributors <- 1
+last_release <- list(date_last_release = "2020-01-01")
+
+fmt <- function(x) format(x, big.mark = ",")
+```
+
+
+### Column {.tabset}
+
+#### Activity
+
+##### Column
+
+###### Row
+
+```{r}
+value_box(
+  title = "Number of contributors",
+  showcase = bsicons::bs_icon("people"),
+  fill = TRUE,
+  theme = "primary",
+  value = n_contributors
+)
+```
+
+```{r}
+value_box(
+  title = "Number of forks",
+  fill = TRUE,
+  theme = "primary",
+  showcase = bsicons::bs_icon("diagram-2"),
+  value = n_stars
+)
+```
+
+```{r}
+value_box(
+  title = "Number of pull requests",
+  fill = TRUE,
+  theme = "primary",
+  showcase = bsicons::bs_icon("git"),
+  value = n_prs
+)
+```
+
+```{r}
+value_box(
+  title = "Weeks since last CRAN update",
+  fill = TRUE,
+  theme = "primary",
+  showcase = bsicons::bs_icon("arrow-counterclockwise"),
+  value = n_downloads
+)
+```
+
+###### Row
+
+```{r}
+n_commits <- readRDS("data/commits.rds")
+n_commits <- n_commits |> filter(pkg == "palaeoverse")
+
+n_commits |>
+  e_charts(x = date) |>
+  e_line(serie = cumul, name = "Cumulative number") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Cumulative number of commits")
+```
+
+
+```{r}
+n_loc <- readRDS("data/git_history.rds")
+n_loc <- n_loc |> filter(pkg == "palaeoverse")
+
+n_loc |>
+  e_charts(x = date) |>
+  e_line(serie = loc, name = "Number of lines of code") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Number of lines of code")
+```
+
+
+#### Code quality
+
+###### Row
+
+```{r}
+code_cov <- get_coverage_time_series("palaeoverse")
+
+code_cov |>
+  e_charts(x = date) |>
+  e_line(serie = coverage, name = "Code coverage") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Code coverage")
+```
+
+```{r}
+cyclocomp <- readRDS("data/git_history.rds")
+cyclocomp <- cyclocomp |> filter(pkg == "palaeoverse")
+
+cyclocomp |>
+  e_charts(x = date) |>
+  e_line(serie = mean_cyclocomp, name = "Average cyclomatic complexity") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Average cyclomatic complexity")
+```
+
+
+###### Row
+
+```{r}
+cov_by_file <- get_coverage_by_file("palaeoverse")
+
+cov_by_file |>
+  reactable(
+    columns = list(
+      file = colDef(name = "File"),
+      coverage = colDef(
+        name = "Coverage (%)",
+        format = colFormat(digits = 1)
+      ),
+      lines = colDef(name = "Lines"),
+      hits = colDef(name = "Hits"),
+      misses = colDef(name = "Misses")
+    ),
+    defaultSorted = list(coverage = "asc"),
+    searchable = TRUE,
+    highlight = TRUE
+  )
+```
+
+```{r}
+cyclocomp_by_function <- get_cyclocomp_by_function("palaeoverse")
+
+cyclocomp_by_function |>
+  reactable(
+    columns = list(
+      function_name = colDef(name = "Function"),
+      complexity = colDef(name = "Cyclomatic complexity")
+    ),
+    defaultSorted = list(complexity = "desc"),
+    searchable = TRUE,
+    highlight = TRUE
+  )
+```
+
+#### Impact
+
+###### Row
+
+```{r}
+value_box(
+  "CRAN downloads",
+  fmt(n_downloads),
+  showcase = bsicons::bs_icon("cloud-download"),
+  theme = "primary"
+)
+```
+
+```{r}
+value_box(
+  "GitHub stars",
+  fmt(n_stars),
+  showcase = bsicons::bs_icon("star"),
+  theme = "primary"
+)
+```
+
+```{r}
+value_box(
+  "Citations",
+  fmt(n_citations),
+  showcase = bsicons::bs_icon("book"),
+  theme = "primary"
+)
+```
+
+```{r}
+value_box(
+  "Reverse dependencies",
+  fmt(n_revdep),
+  showcase = bsicons::bs_icon("arrow-down"),
+  theme = "primary"
+)
+```
+
+###### Row
+
+```{r}
+cran_dl <- get_number_of_downloads_time_series("palaeoverse")
+
+cran_dl |>
+  filter(
+    (as.numeric(gsub("\\d{4}-\\d{2}-(\\d{2})", "\\1", date)) %% 7) == 0
+  ) |>
+  e_charts(x = date) |>
+  e_line(serie = cumul, name = "Cumulative number") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Cumulative number of CRAN downloads")
+```
+
+
+```{r}
+stars <- get_number_of_stars_time_series("palaeoverse")
+
+stars |>
+  e_charts(x = date) |>
+  e_line(serie = cumul, name = "Cumulative number") |>
+  e_tooltip(trigger = "axis") |>
+  e_title("Cumulative number of Github stars")
+```
