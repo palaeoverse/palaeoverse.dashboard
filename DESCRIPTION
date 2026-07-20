@@ -1,5 +1,5 @@
 Type: Project
-Package: palaeoversedash
+Package: palaeoverse.dashboard
 Title: Palaeoverse Packages Dashboard
 Version: 0.0.1
 Description: A Quarto dashboard tracking activity, code quality and impact
@@ -28,3 +28,5 @@ Remotes:
     etiennebacher/cyclocomp@speedup,
     etiennebacher/loc,
     ropensci/universe
+URL: https://github.com/palaeoverse/palaeoverse.dashboard
+BugReports: https://github.com/palaeoverse/palaeoverse.dashboard/issues
