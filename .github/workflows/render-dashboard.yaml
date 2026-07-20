@@ -1,24 +1,17 @@
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'index.qmd'
-      - 'stats.R'
-      - 'data/**'
-      - '_brand/**'
-      - 'assets/**'
+    branches: [main]
   schedule:
     - cron: "0 6 * * *"   # daily, after the data refresh
   workflow_dispatch:
 
-name: build-dash
+name: render-dashboard
 
 permissions:
   contents: write
 
 jobs:
-  build-dash:
+  render-dashboard:
     runs-on: ubuntu-latest
     env:
       # Authenticated GitHub API calls (gh::gh(), universe) get a higher rate limit
