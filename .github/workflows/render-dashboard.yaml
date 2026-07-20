@@ -1,6 +1,12 @@
 on:
   push:
     branches: [main]
+    paths:
+      - 'index.qmd'
+      - 'stats.R'
+      - 'data/**'
+      - '_brand/**'
+      - 'data/**'
   schedule:
     - cron: "0 6 * * *"   # daily, after the data refresh
   workflow_dispatch:
