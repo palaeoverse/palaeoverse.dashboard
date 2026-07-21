@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Authenticated GitHub API calls (higher rate limit) for gh::gh()
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
     steps:
       - uses: actions/checkout@v4
 
