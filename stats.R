@@ -2,6 +2,33 @@ library(cranlogs)
 library(dplyr)
 library(gh)
 library(jsonlite)
+library(openalexR)
+
+get_number_of_citations <- function(pkg) {
+  doi <- switch(
+    pkg,
+    "palaeoverse" = "10.1111/2041-210x.14099",
+    "rmacrostrat" = "10.1130/GES02815.1",
+    "rphylopic" = "10.1111/2041-210X.14221",
+    "sepkoski" = "10.5281/zenodo.7342194",
+    stop("unreachable")
+  )
+  citations_raw <- oa_fetch(entity = "works", doi = doi)
+  sum(citations_raw$cited_by_count)
+}
+
+get_number_of_revdep <- function(pkg) {
+  length(tools:::package_dependencies(pkg, reverse = TRUE, which = "all")[[
+    pkg
+  ]])
+}
+
+### Number of downloads (using a starting date that predates all packages)
+n_downloads <- cranlogs::cran_downloads(
+  packages = c("palaeoverse", "sepkoski", "rphylopic", "rmacrostrat"),
+  from = "2015-01-01",
+  to = Sys.Date()
+)
 
 get_number_of_stars <- function(pkg) {
   gh(
@@ -76,13 +103,21 @@ get_number_of_commits_time_series <- function(pkg) {
   if (!length(commits)) {
     return(data.frame(date = as.Date(character()), count = integer()))
   }
-  dates <- as.Date(vapply(commits, function(x) x$commit$author$date, character(1)))
+  dates <- as.Date(vapply(
+    commits,
+    function(x) x$commit$author$date,
+    character(1)
+  ))
   tab <- table(dates)
   data.frame(date = as.Date(names(tab)), count = as.vector(tab))
 }
 
 update_commits_time_series <- function(existing = NULL, pkg) {
-  since <- if (is.null(existing) || !nrow(existing)) NULL else max(existing$date)
+  since <- if (is.null(existing) || !nrow(existing)) {
+    NULL
+  } else {
+    max(existing$date)
+  }
   new <- .commits_by_day(pkg, since = since)
 
   # Keep everything strictly before `since`; the partial last day is refetched
@@ -293,7 +328,11 @@ get_git_history_stats <- function(pkg, since = NULL) {
 
 # Append newest commit-days to a previously stored git-history data frame
 update_git_history_stats <- function(existing = NULL, pkg) {
-  since <- if (is.null(existing) || !nrow(existing)) NULL else max(existing$date)
+  since <- if (is.null(existing) || !nrow(existing)) {
+    NULL
+  } else {
+    max(existing$date)
+  }
   new <- get_git_history_stats(pkg, since = since)
 
   base <- if (is.null(since)) {
