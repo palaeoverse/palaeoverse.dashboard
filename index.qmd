@@ -37,21 +37,23 @@ pkg <- "palaeoverse"
 
 all_stats <- universe::universe_one_package("palaeoverse", pkg)
 
-# n_downloads <- get_number_of_downloads(pkg)
-# n_stars <- all_stats[["_stars"]]
-# n_forks <- get_number_of_forks(pkg)
-# n_prs <- get_number_of_prs(pkg, state = "all")
-# n_contributors <- all_stats[["_contributors"]]
-# last_release <- get_number_of_weeks_since_last_release(pkg)
+n_downloads <- get_number_of_downloads(pkg)
+n_stars <- all_stats[["_stars"]]
+n_forks <- get_number_of_forks(pkg)
+n_prs <- get_number_of_prs(pkg, state = "all")
+n_citations <- get_number_of_citations(pkg)
+n_revdep <- get_number_of_revdep(pkg)
+n_contributors <- length(all_stats[["_contributors"]])
+last_release <- get_number_of_weeks_since_last_release(pkg)
 
-n_downloads <- 1
-n_stars <- 1
-n_forks <- 1
-n_prs <- 1
-n_citations <- 1
-n_revdep <- 1
-n_contributors <- 1
-last_release <- list(date_last_release = "2020-01-01")
+# n_downloads <- 1
+# n_stars <- 1
+# n_forks <- 1
+# n_prs <- 1
+# n_citations <- 1
+# n_revdep <- 1
+# n_contributors <- 1
+# last_release <- list(date_last_release = "2020-01-01")
 
 fmt <- function(x) format(x, big.mark = ",")
 ```
@@ -81,7 +83,7 @@ value_box(
   fill = TRUE,
   theme = "primary",
   showcase = bsicons::bs_icon("diagram-2"),
-  value = n_stars
+  value = n_forks
 )
 ```
 
@@ -101,7 +103,7 @@ value_box(
   fill = TRUE,
   theme = "primary",
   showcase = bsicons::bs_icon("arrow-counterclockwise"),
-  value = n_downloads
+  value = last_release[["n_weeks_last_release"]]
 )
 ```
 
