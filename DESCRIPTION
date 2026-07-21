@@ -27,8 +27,8 @@ Imports:
     universe
 Remotes:
     etiennebacher/cyclocomp@speedup,
-    etiennebacher/gert@clone-depth,
     etiennebacher/loc,
+    r-lib/gert,
     ropensci/universe
 URL: https://github.com/palaeoverse/palaeoverse.dashboard
 BugReports: https://github.com/palaeoverse/palaeoverse.dashboard/issues
