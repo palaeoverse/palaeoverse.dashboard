@@ -272,13 +272,13 @@ get_coverage_by_file <- function(
     (\(d) d[order(d$coverage), ])()
 }
 
-# Last commit of each day (>= `since`), oldest first. `commits()` lists newest
+# Last commit of each day (>= `since`), oldest first. `git_log()` lists newest
 # first, so the first commit seen for a date is that day's last commit.
 .commit_days <- function(repo, since = NULL) {
-  cm <- git2r::commits(repo)
-  date <- as.Date(vapply(cm, function(x) git2r::when(x), character(1)))
+  log <- gert::git_log(repo = repo, max = .Machine$integer.max)
+  date <- as.Date(log$time)
   keep <- !duplicated(date)
-  cm <- cm[keep]
+  cm <- log$commit[keep]
   date <- date[keep]
   if (!is.null(since)) {
     sel <- date >= since
@@ -293,10 +293,10 @@ get_coverage_by_file <- function(
 # and a single checkout pass (both walk the same history). `since` restricts the
 # walk to the recent tail so incremental updates only re-check out new days.
 get_git_history_stats <- function(pkg, since = NULL) {
-  repo <- git2r::clone(
+  repo <- gert::git_clone(
     paste0("https://github.com/palaeoverse/", pkg),
     pkg,
-    progress = FALSE
+    verbose = FALSE
   )
   on.exit(fs::dir_delete(pkg), add = TRUE)
 
@@ -313,7 +313,7 @@ get_git_history_stats <- function(pkg, since = NULL) {
 
   rows <- lapply(seq_along(cd$commits), function(i) {
     message("[", pkg, "] processing ", cd$dates[i])
-    git2r::checkout(cd$commits[[i]], force = TRUE)
+    gert::git_reset_hard(cd$commits[[i]], repo = repo)
     cc <- cyclocomp_from_source(pkg)$complexity
     data.frame(
       date = cd$dates[i],
@@ -401,10 +401,11 @@ cyclocomp_from_source <- function(dir) {
 
 # Cyclomatic complexity of each function at the current HEAD of a package
 get_cyclocomp_by_function <- function(pkg) {
-  git2r::clone(
+  gert::git_clone(
     paste0("https://github.com/palaeoverse/", pkg),
     pkg,
-    progress = FALSE
+    verbose = FALSE,
+    depth = 1
   )
   on.exit(fs::dir_delete(pkg), add = TRUE)
 

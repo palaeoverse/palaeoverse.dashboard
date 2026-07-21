@@ -14,9 +14,9 @@ Imports:
     dplyr,
     echarts4r,
     fs,
+    gert,
     gh,
     ggplot2,
-    git2r,
     httr2,
     jsonlite,
     knitr,
@@ -27,6 +27,7 @@ Imports:
     universe
 Remotes:
     etiennebacher/cyclocomp@speedup,
+    etiennebacher/gert@clone-depth,
     etiennebacher/loc,
     ropensci/universe
 URL: https://github.com/palaeoverse/palaeoverse.dashboard
