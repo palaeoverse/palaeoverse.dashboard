@@ -5,8 +5,6 @@ format: dashboard
 
 theme:
   - cosmo
-  - assets/styles/custom.scss
-  - assets/styles/quarto.scss
   - brand
 
 execute:

@@ -16,6 +16,9 @@ README.html
 
 # Directories that start with _
 _*/
+# …but the brand assets must be tracked and shipped to CI
+!/_brand/
+!/_brand/**
 
 ## https://github.com/github/gitignore/blob/master/R.gitignore
 # History files
