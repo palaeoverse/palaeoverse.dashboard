@@ -74,6 +74,7 @@ n_commits <- n_commits |> filter(pkg == .env$pkg)
 n_commits |>
   e_charts(x = date) |>
   e_line(serie = cumul, name = "Cumulative number") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Cumulative number of commits")
@@ -87,6 +88,7 @@ n_loc <- n_loc |> filter(pkg == .env$pkg)
 n_loc |>
   e_charts(x = date) |>
   e_line(serie = loc, name = "Number of lines of code") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Number of lines of code")
@@ -103,6 +105,7 @@ code_cov <- get_coverage_time_series(pkg)
 code_cov |>
   e_charts(x = date) |>
   e_line(serie = coverage, name = "Code coverage") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Code coverage")
@@ -115,6 +118,7 @@ cyclocomp <- cyclocomp |> filter(pkg == .env$pkg)
 cyclocomp |>
   e_charts(x = date) |>
   e_line(serie = mean_cyclocomp, name = "Average cyclomatic complexity") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Average cyclomatic complexity")
@@ -210,6 +214,7 @@ cran_dl |>
   ) |>
   e_charts(x = date) |>
   e_line(serie = cumul, name = "Cumulative number") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Cumulative number of CRAN downloads")
@@ -222,6 +227,7 @@ stars <- get_number_of_stars_time_series(pkg)
 stars |>
   e_charts(x = date) |>
   e_line(serie = cumul, name = "Cumulative number") |>
+  e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Cumulative number of Github stars")
