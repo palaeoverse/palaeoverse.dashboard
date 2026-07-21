@@ -87,3 +87,5 @@ Temporary Items
 
 index_files
 .Renviron
+/.quarto/
+**/*.quarto_ipynb
