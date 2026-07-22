@@ -49,20 +49,26 @@ body,
 // `.cell-output-display` wrapper with no gap, so they'd otherwise touch. Space
 // out the badges and stats rows from the row above with an explicit margin
 // (bslib's fill container can swallow a container `gap`, so use margins).
+.last-cran-update,
 .overview-badges {
-  margin-top: 1rem !important;
+  margin-top: 2rem !important;
+}
+
+.last-cran-update {
+  text-align: center;
 }
 
 .overview-stats {
   margin-top: 2rem !important;
 }
 
-// The two badges on one centred line, separated by a middot. `flex-direction`
-// and the child `!important` override bslib's `.html-fill-container`, which
-// forces a column and would stack the badges vertically.
+// The badges sit on a centred line. `flex-direction` and the child `!important`
+// override bslib's `.html-fill-container`, which forces a column and would
+// stack the badges vertically. `flex-wrap` lets the third badge drop below.
 .overview-badges {
   display: flex;
   flex-direction: row !important;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: .5rem;
@@ -72,7 +78,13 @@ body,
   >* {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: .5rem;
+  }
+
+  // Force the third badge onto its own full-width line below the first two.
+  >:nth-child(3) {
+    flex-basis: 100%;
   }
 
   img {

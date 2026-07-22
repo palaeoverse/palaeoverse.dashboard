@@ -46,16 +46,26 @@ overview_stat <- function(icon, value, label) {
 # The card itself and its header (the package name) are provided by the
 # dashboard cell + its `title` option.
 overview_card <- function(pkg) {
+  last_release_info <- get_last_release_info(pkg)
   htmltools::HTML(paste0(
     "<div class=\"overview-cran\"><strong>CRAN checks:</strong> ",
     get_cran_checks(pkg),
     "</div>",
+    "<span class=\"last-cran-update\"><strong>Last CRAN release:</strong><br>",
+    last_release_info[["date_last_release"]],
+    " (",
+    last_release_info[["n_weeks_last_release"]],
+    " weeks ago) ",
+    "</span>",
     "<div class=\"overview-badges\">",
     "<span>",
     get_ci_status(pkg),
     "</span>",
     "<span>",
     get_coverage(pkg),
+    "</span>",
+    "<span>",
+    get_pkgdown_status(pkg),
     "</span>",
     "</div>",
     "<div class=\"overview-stats\">",

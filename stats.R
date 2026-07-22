@@ -419,7 +419,7 @@ get_cyclocomp_time_series <- function(pkg) {
   ]
 }
 
-get_number_of_weeks_since_last_release <- function(pkg) {
+get_last_release_info <- function(pkg) {
   cran_page <- readLines(paste0(
     "https://cran.r-project.org/web/packages/",
     pkg,
@@ -529,6 +529,16 @@ get_ci_status <- function(pkg) {
     "/actions?workflow=R-CMD-check\"><img src=\"https://github.com/palaeoverse/",
     pkg,
     "/workflows/R-CMD-check/badge.svg\"></a>"
+  )
+}
+
+get_pkgdown_status <- function(pkg) {
+  paste0(
+    "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
+    pkg,
+    "/actions?workflow=pkgdown\"><img src=\"https://github.com/palaeoverse/",
+    pkg,
+    "/workflows/pkgdown/badge.svg\"></a>"
   )
 }
 

@@ -13,7 +13,7 @@ n_prs <- get_number_of_prs(pkg, state = "all")
 n_citations <- get_number_of_citations(pkg)
 n_revdep <- get_number_of_revdep(pkg)
 n_contributors <- length(all_stats[["_contributors"]])
-last_release <- get_number_of_weeks_since_last_release(pkg)
+last_release <- get_last_release_info(pkg)
 ```
 
 
