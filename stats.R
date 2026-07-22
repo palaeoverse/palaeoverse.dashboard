@@ -528,7 +528,7 @@ get_ci_status <- function(pkg) {
     pkg,
     "/actions?query=workflow%3AR-CMD-check+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
-    "/workflows/R-CMD-check/badge.svg?branch=main\"></a>"
+    "/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main\"></a>"
   )
 }
 
@@ -538,7 +538,7 @@ get_pkgdown_status <- function(pkg) {
     pkg,
     "/actions?query=workflow%3Apkgdown+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
-    "/workflows/pkgdown/badge.svg?branch=main\"></a>"
+    "/actions/workflows/pkgdown.yaml/badge.svg?branch=main\"></a>"
   )
 }
 
