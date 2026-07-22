@@ -526,9 +526,9 @@ get_ci_status <- function(pkg) {
   paste0(
     "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
     pkg,
-    "/actions?workflow=R-CMD-check\"><img src=\"https://github.com/palaeoverse/",
+    "actions?query=workflow%3AR-CMD-check+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
-    "/workflows/R-CMD-check/badge.svg\"></a>"
+    "/workflows/R-CMD-check/badge.svg?branch=main\"></a>"
   )
 }
 
@@ -536,9 +536,9 @@ get_pkgdown_status <- function(pkg) {
   paste0(
     "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
     pkg,
-    "/actions?workflow=pkgdown\"><img src=\"https://github.com/palaeoverse/",
+    "actions?query=workflow%3Apkgdown+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
-    "/workflows/pkgdown/badge.svg\"></a>"
+    "/workflows/pkgdown/badge.svg?branch=main\"></a>"
   )
 }
 
