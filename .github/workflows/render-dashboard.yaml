@@ -3,6 +3,7 @@ on:
     branches: [main]
     paths:
       - 'index.qmd'
+      - '_package.qmd'
       - 'stats.R'
       - 'data/**'
       - '_brand/**'
