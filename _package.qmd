@@ -108,7 +108,7 @@ code_cov |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
-  e_title("Code coverage")
+  e_title("Code coverage", subtext = "Higher is better")
 ```
 
 ```{r}
@@ -121,7 +121,7 @@ cyclocomp |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
-  e_title("Average cyclomatic complexity")
+  e_title("Average cyclomatic complexity", subtext = "Lower is better")
 ```
 
 
