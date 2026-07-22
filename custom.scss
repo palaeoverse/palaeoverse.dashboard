@@ -1,0 +1,142 @@
+/*-- scss:rules --*/
+
+$bg-light: mix($brand-light-blue, white, 15%); // pale page background
+$bg-dark: mix($brand-light-blue, white, 60%); // more saturated navbar
+
+.navbar {
+  background: $bg-dark !important;
+  border-bottom: 2px solid $secondary;
+  margin-bottom: 1em;
+}
+
+body,
+.bg-light {
+  background-color: $bg-light !important;
+}
+
+// Each overview card body is a bslib `.html-fill-container`: a flex column
+// whose children otherwise stretch to fill the card height, which throws the
+// spacing off. Centre the three rows (CRAN line, badges, stats grid), give them
+// one uniform gap and stop them growing. The card may be taller than its
+// content — the rows sit at the top rather than filling the height.
+#overview .card-body {
+  align-items: center;
+  justify-content: flex-start;
+  gap: .75rem !important;
+
+  >* {
+    flex: 0 0 auto !important;
+  }
+}
+
+.overview-row {
+  --overview-card-width: 24rem;
+  grid-template-columns:
+    var(--overview-card-width) var(--overview-card-width) !important;
+  justify-content: center;
+  column-gap: 2rem;
+}
+
+// CRAN check status on its own centred line at the top. Force plain block flow
+// (bslib tags this `.html-fill-container`, whose flex column would push the
+// status onto a line separate from its "CRAN checks:" label).
+.overview-cran {
+  display: block !important;
+  text-align: center;
+}
+
+// The three card rows (CRAN line, badges, stats) are direct children of a
+// `.cell-output-display` wrapper with no gap, so they'd otherwise touch. Space
+// out the badges and stats rows from the row above with an explicit margin
+// (bslib's fill container can swallow a container `gap`, so use margins).
+.overview-badges {
+  margin-top: 1rem !important;
+}
+
+.overview-stats {
+  margin-top: 2rem !important;
+}
+
+// The two badges on one centred line, separated by a middot. `flex-direction`
+// and the child `!important` override bslib's `.html-fill-container`, which
+// forces a column and would stack the badges vertically.
+.overview-badges {
+  display: flex;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+
+  // Each badge is a centred flex row so it and its leading middot share one
+  // vertical centre line.
+  >* {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  img {
+    display: block; // drop inline-image descender gap so badges centre-align
+  }
+}
+
+// The stats are two rows of two, stacked in a centred column. bslib's fill
+// container overrides `display`/`flex-direction` (hence `!important`) and can
+// swallow flex `gap`, so the space between the rows is an explicit `margin` on
+// the second row rather than a container gap.
+.overview-stats {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+}
+
+// One row: its two stats sit side by side, centred.
+.overview-stats-row {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.overview-stats-row+.overview-stats-row {
+  margin-top: 1rem !important;
+}
+
+.overview-stat {
+  display: flex;
+  // `!important` overrides the `flex-direction: column` bslib's
+  // `.html-fill-container` applies, which would stack the icon above the text.
+  flex-direction: row !important;
+  align-items: center;
+  gap: .4rem;
+
+  .bi {
+    color: var(--bg-dark);
+    flex-shrink: 0;
+  }
+}
+
+.overview-stat-value {
+  font-weight: 600;
+}
+
+.overview-stat-label {
+  color: var(--bs-secondary-color);
+}
+
+// The `author` field renders as `.navbar-author` inside the left-aligned brand
+// container. Pin it to the right edge of the navbar instead.
+.navbar .navbar-container {
+  position: relative;
+}
+
+.navbar-author {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: .8rem;
+  font-weight: 400;
+  white-space: nowrap;
+}

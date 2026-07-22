@@ -155,16 +155,16 @@ get_number_of_prs <- function(pkg, state = c("all", "open", "closed")) {
     length()
 }
 
-# get_number_of_issues <- function(pkg, state = c("all", "open", "closed")) {
-#   #   gh(
-#     "GET /repos/palaeoverse/{pkg}/issues?state={state}&pulls=false",
-#     pkg = pkg,
-#     state = state,
-#     .accept = "application/vnd.github.v3.star+json",
-#     .limit = Inf
-#   ) |>
-#     length()
-# }
+# The issues endpoint returns pull requests too, so drop entries that carry a
+# `pull_request` field to count genuine issues only.
+get_number_of_open_issues <- function(pkg) {
+  issues <- gh(
+    "GET /repos/palaeoverse/{pkg}/issues?state=open",
+    pkg = pkg,
+    .limit = Inf
+  )
+  sum(vapply(issues, function(x) is.null(x$pull_request), logical(1)))
+}
 
 get_number_of_unique_contributors <- function(pkg) {
   gh(
@@ -458,4 +458,86 @@ get_number_of_downloads_time_series <- function(pkg) {
   dl
 }
 
-get_cran_checks <- function(pkg) {}
+get_cran_checks <- function(pkg) {
+  url <- sprintf(
+    "https://cloud.r-project.org/web/checks/check_results_%s.html",
+    pkg
+  )
+  html_page <- xml2::read_html(url)
+  html_table <- rvest::html_table(html_page)
+  check_status <- html_table[[1]]$Status
+
+  if (all(check_status == "OK")) {
+    return("<span style=\"color: #00b300\">OK</span>")
+  }
+
+  n_notes <- length(which(check_status == "NOTE"))
+  n_warnings <- length(which(check_status %in% c("WARN", "WARNING")))
+  n_errors <- length(which(check_status == "ERROR"))
+
+  if (n_notes > 0) {
+    note <- paste0(
+      "<span style=\"color: blue\">",
+      n_notes,
+      " Note",
+      if (n_notes > 1) "s" else "",
+      "</span>"
+    )
+  } else {
+    note <- NULL
+  }
+
+  if (n_warnings > 0) {
+    warning <- paste0(
+      "<span style=\"color: orange\">",
+      n_warnings,
+      " Warning",
+      if (n_warnings > 1) "s" else "",
+      "</span>"
+    )
+  } else {
+    warning <- NULL
+  }
+
+  if (n_errors > 0) {
+    error <- paste0(
+      "<span style=\"color: red\">",
+      n_errors,
+      " Error",
+      if (n_errors > 1) "s" else "",
+      "</span>"
+    )
+  } else {
+    error <- NULL
+  }
+
+  out <- paste0(
+    "<a href=\"",
+    url,
+    "\" target=\"_blank\">",
+    datawizard::text_concatenate(c(note, warning, error), last = ", "),
+    "</a>"
+  )
+
+  out
+}
+
+get_ci_status <- function(pkg) {
+  paste0(
+    "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
+    pkg,
+    "/actions?workflow=R-CMD-check\"><img src=\"https://github.com/palaeoverse/",
+    pkg,
+    "/workflows/R-CMD-check/badge.svg\"></a>"
+  )
+}
+
+get_coverage <- function(pkg) {
+  paste0(
+    "<a rel=\"noopener\" target=\"_blank\" href=\"https://codecov.io/gh/palaeoverse/",
+    pkg,
+    "\"><img src=\"https://codecov.io/gh/palaeoverse/",
+    pkg,
+    "/branch/main/graph/badge.svg\"></a>"
+  )
+}
