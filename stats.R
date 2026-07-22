@@ -515,7 +515,7 @@ get_cran_checks <- function(pkg) {
     "<a href=\"",
     url,
     "\" target=\"_blank\">",
-    datawizard::text_concatenate(c(note, warning, error), last = ", "),
+    paste(c(note, warning, error), collapse = ", "),
     "</a>"
   )
 
