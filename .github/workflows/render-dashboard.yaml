@@ -7,7 +7,7 @@ on:
       - 'stats.R'
       - 'data/**'
       - '_brand/**'
-      - 'data/**'
+      - 'custom.scss'
   schedule:
     - cron: "0 6 * * *"   # daily, after the data refresh
   workflow_dispatch:
