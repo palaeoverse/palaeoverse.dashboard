@@ -2,8 +2,7 @@
 title: "Palaeoverse packages dashboard"
 logo: _brand/logos/logo.png
 format: dashboard
-
-author: "Last updated: `r as.character(format(Sys.time()))`"
+author: "<a href='https://github.com/palaeoverse/palaeoverse-dashboard' target='_blank' rel='noopener'><i class='bi bi-github'></i></a>&nbsp; Last updated: `r as.character(format(Sys.time()))`"
 
 theme:
   - cosmo
@@ -128,7 +127,7 @@ overview_card("sepkoski")
 pkg <- "palaeoverse"
 ```
 
-{{< include _package.qmd >}}
+<!-- {{< include _package.qmd >}} -->
 
 
 # rmacrostrat
@@ -137,7 +136,7 @@ pkg <- "palaeoverse"
 pkg <- "rmacrostrat"
 ```
 
-{{< include _package.qmd >}}
+<!-- {{< include _package.qmd >}} -->
 
 
 # rphylopic
@@ -146,7 +145,7 @@ pkg <- "rmacrostrat"
 pkg <- "rphylopic"
 ```
 
-{{< include _package.qmd >}}
+<!-- {{< include _package.qmd >}} -->
 
 
 # sepkoski
@@ -155,4 +154,4 @@ pkg <- "rphylopic"
 pkg <- "sepkoski"
 ```
 
-{{< include _package.qmd >}}
+<!-- {{< include _package.qmd >}} -->
