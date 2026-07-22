@@ -127,7 +127,7 @@ overview_card("sepkoski")
 pkg <- "palaeoverse"
 ```
 
-<!-- {{< include _package.qmd >}} -->
+{{< include _package.qmd >}}
 
 
 # rmacrostrat
@@ -136,7 +136,7 @@ pkg <- "palaeoverse"
 pkg <- "rmacrostrat"
 ```
 
-<!-- {{< include _package.qmd >}} -->
+{{< include _package.qmd >}}
 
 
 # rphylopic
@@ -145,7 +145,7 @@ pkg <- "rmacrostrat"
 pkg <- "rphylopic"
 ```
 
-<!-- {{< include _package.qmd >}} -->
+{{< include _package.qmd >}}
 
 
 # sepkoski
@@ -154,4 +154,4 @@ pkg <- "rphylopic"
 pkg <- "sepkoski"
 ```
 
-<!-- {{< include _package.qmd >}} -->
+{{< include _package.qmd >}}
