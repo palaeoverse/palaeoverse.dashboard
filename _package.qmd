@@ -26,41 +26,46 @@ last_release <- get_last_release_info(pkg)
 ###### Row
 
 ```{r}
-value_box(
+#| content: valuebox
+#| expandable: false
+list(
   title = "Number of contributors",
-  showcase = bsicons::bs_icon("people"),
-  fill = TRUE,
-  theme = "primary",
+  icon = "people",
+  color = "primary",
   value = n_contributors
 )
 ```
 
 ```{r}
-value_box(
+#| content: valuebox
+#| expandable: false
+list(
   title = "Number of forks",
-  fill = TRUE,
-  theme = "primary",
-  showcase = bsicons::bs_icon("diagram-2"),
+  color = "primary",
+  icon = "diagram-2",
   value = n_forks
 )
 ```
 
+
 ```{r}
-value_box(
+#| content: valuebox
+#| expandable: false
+list(
   title = "Number of pull requests",
-  fill = TRUE,
-  theme = "primary",
-  showcase = bsicons::bs_icon("git"),
+  color = "primary",
+  icon = "git",
   value = n_prs
 )
 ```
 
 ```{r}
-value_box(
+#| content: valuebox
+#| expandable: false
+list(
   title = "Weeks since last CRAN update",
-  fill = TRUE,
-  theme = "primary",
-  showcase = bsicons::bs_icon("arrow-counterclockwise"),
+  color = "primary",
+  icon = "arrow-counterclockwise",
   value = last_release[["n_weeks_last_release"]]
 )
 ```
@@ -168,38 +173,46 @@ cyclocomp_by_function |>
 ###### Row
 
 ```{r}
-value_box(
-  "CRAN downloads",
-  fmt(n_downloads),
-  showcase = bsicons::bs_icon("cloud-download"),
-  theme = "primary"
+#| content: valuebox
+#| expandable: false
+list(
+  title = "CRAN downloads",
+  value = fmt(n_downloads),
+  icon = "cloud-download",
+  color = "primary"
 )
 ```
 
 ```{r}
-value_box(
-  "GitHub stars",
-  fmt(n_stars),
-  showcase = bsicons::bs_icon("star"),
-  theme = "primary"
+#| content: valuebox
+#| expandable: false
+list(
+  title = "GitHub stars",
+  value = fmt(n_stars),
+  icon = "star",
+  color = "primary"
 )
 ```
 
 ```{r}
-value_box(
-  "Citations",
-  fmt(n_citations),
-  showcase = bsicons::bs_icon("book"),
-  theme = "primary"
+#| content: valuebox
+#| expandable: false
+list(
+  title = "Citations",
+  value = fmt(n_citations),
+  icon = "book",
+  color = "primary"
 )
 ```
 
 ```{r}
-value_box(
-  "Reverse dependencies",
-  fmt(n_revdep),
-  showcase = bsicons::bs_icon("arrow-down"),
-  theme = "primary"
+#| content: valuebox
+#| expandable: false
+list(
+  title = "Reverse dependencies",
+  value = fmt(n_revdep),
+  icon = "arrow-down",
+  color = "primary"
 )
 ```
 
