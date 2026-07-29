@@ -27,11 +27,8 @@ Imports:
     rvest,
     xml2
 Remotes:
-    # for more performant cyclomatic complexity
     etiennebacher/cyclocomp@speedup,
-    # not on CRAN
     etiennebacher/loc,
-    # to be able to clone a repo with depth 1
     r-lib/gert
 URL: https://github.com/palaeoverse/palaeoverse.dashboard
 BugReports: https://github.com/palaeoverse/palaeoverse.dashboard/issues
