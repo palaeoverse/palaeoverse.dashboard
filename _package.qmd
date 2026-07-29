@@ -5,6 +5,7 @@ and produces the same layout and output types for all tabs.
 
 ```{r}
 # Every metric that has a time series. 
+pkg <- "rmacrostrat"
 series <- package_time_series(pkg)
 
 # Those don't have an associated time series.
@@ -31,20 +32,20 @@ vbox("Number of contributors", "people", get_latest(pkg, "contributors"))
 ```{r}
 #| content: valuebox
 #| expandable: false
-vbox("Number of forks", "diagram-2", get_latest(pkg, "forks"))
+vbox("Number of forks", "diagram-2", get_latest(pkg, "forks", default_return = 0))
 ```
 
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-vbox("Number of open issues", "exclamation-circle", get_latest(pkg, "open_issues"))
+vbox("Number of open issues", "exclamation-circle", get_latest(pkg, "open_issues", default_return = 0))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-vbox("Number of open pull requests", "git", get_latest(pkg, "open_pull_requests"))
+vbox("Number of open pull requests", "git", get_latest(pkg, "open_pull_requests", default_return = 0))
 ```
 
 ```{r}

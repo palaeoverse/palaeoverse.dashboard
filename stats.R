@@ -121,7 +121,7 @@ ts_open_issues <- function(pkg) {
     )
   )
   if (is.null(out)) {
-    0
+    data.frame(date = as.Date(character()), value = numeric(0))
   } else {
     out
   }
@@ -153,7 +153,7 @@ ts_open_pull_requests <- function(pkg) {
     )
   )
   if (is.null(out)) {
-    0
+    data.frame(date = as.Date(character()), value = numeric(0))
   } else {
     out
   }
@@ -325,13 +325,13 @@ latest_youtube_views <- function() {
 
 # Helper function to quickly get the latest observation in a time series, e.g.
 # get_latest(pkg, "cran_downloads")
-get_latest <- function(pkg, metric) {
+get_latest <- function(pkg, metric, default_return = NA) {
   if (!metric %in% names(time_series)) {
     stop("unknown metric: ", metric)
   }
   series <- package_time_series(pkg)[[metric]]
   if (!NROW(series)) {
-    return(NA)
+    return(default_return)
   }
   series$value[which.max(series$date)]
 }
