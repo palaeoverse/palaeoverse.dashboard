@@ -6,7 +6,10 @@ $bg-dark: mix($brand-light-blue, white, 60%); // more saturated navbar
 .navbar {
   background: $bg-dark !important;
   border-bottom: 2px solid $secondary;
-  margin-bottom: 1em;
+  // The bottom margin also holds the "Last updated" line, which hangs below the
+  // navbar (see `.navbar-author`), hence more than a plain separating space.
+  margin-bottom: 2.2em;
+  position: relative;
 }
 
 body,
@@ -137,20 +140,30 @@ body,
 }
 
 // The `author` field renders as `.navbar-author` inside the left-aligned brand
-// container. Pin it to the right edge of the navbar instead.
-.navbar .navbar-container {
-  position: relative;
-}
-
-.navbar-author {
+// container. The right edge of the navbar is taken by the nav buttons
+// (`.quarto-dashboard-links`, in normal flow), so pinning the author there put
+// the two on top of each other. It hangs just below the navbar instead: still
+// in the top right corner, but on a line of its own that nothing else uses.
+// Quarto styles this as
+// `.quarto-dashboard #quarto-dashboard-header .navbar .navbar-author`, so the
+// same selector is needed to win on `font-size` and `margin`: a plain
+// `.navbar-author` is less specific and only gets the properties Quarto leaves
+// alone (this file comes after the dashboard's own rules, so equal specificity
+// is enough).
+.quarto-dashboard #quarto-dashboard-header .navbar .navbar-author {
   position: absolute;
   right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  // 100% is the bottom of the navbar's padding box, so the offset clears the
+  // 2px bottom border and leaves a small gap under it.
+  top: calc(100% + .5rem);
+  z-index: 2;
   margin: 0;
-  font-size: .8rem;
+  font-size: .75rem;
   font-weight: 400;
   white-space: nowrap;
+  // It reads against the page background now rather than the navbar, so it
+  // can't inherit the navbar's light-on-dark text colour.
+  color: $brand-dark-grey;
 }
 
 .card-header {

@@ -232,7 +232,10 @@ update_git_history_stats <- function(existing = NULL, pkg) {
 .lecture_video_ids <- function() {
   links <- read.csv(.lecture_sheet_csv)[["Youtube.link"]]
   links <- links[!is.na(links) & nzchar(links)]
-  unique(regmatches(links, regexpr("(?<=v=)[A-Za-z0-9_-]+", links, perl = TRUE)))
+  unique(regmatches(
+    links,
+    regexpr("(?<=v=)[A-Za-z0-9_-]+", links, perl = TRUE)
+  ))
 }
 
 # Youtube doesn't put the view count in the page itself: it ships the data the

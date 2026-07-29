@@ -5,7 +5,6 @@ and produces the same layout and output types for all tabs.
 
 ```{r}
 # Every metric that has a time series. 
-pkg <- "rmacrostrat"
 series <- package_time_series(pkg)
 
 # Those don't have an associated time series.
@@ -154,13 +153,13 @@ vbox("CRAN downloads", "cloud-download", get_latest(pkg, "cran_downloads"))
 ```{r}
 #| content: valuebox
 #| expandable: false
-vbox("GitHub stars", "star", get_latest(pkg, "github_stars"))
+vbox("GitHub stars", "star", get_latest(pkg, "github_stars", default_return = 0))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-vbox("Citations", "book", get_latest(pkg, "citations"))
+vbox("Citations", "book", get_latest(pkg, "citations", default_return = 0))
 ```
 
 ```{r}
@@ -169,7 +168,7 @@ vbox("Citations", "book", get_latest(pkg, "citations"))
 vbox(
   "Reverse dependencies",
   "arrow-down",
-  get_latest(pkg, "reverse_dependencies")
+  get_latest(pkg, "reverse_dependencies", default_return = 0)
 )
 ```
 
