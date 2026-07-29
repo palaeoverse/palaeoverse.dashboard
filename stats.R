@@ -1,11 +1,24 @@
+# Two families of functions:
+#
+# * `ts_*(pkg)` returns a time series with `date` and `value` (cumulative count).
+# * `latest_*(pkg)` returns the latest value from the time series.
+#
+# Note that series that take time to compile (commits, LOC, cyclomatic complexity,
+# reverse dependencies) are collected incrementally by fetch.R, which is also where
+# the `update_*()` functions that produce them live. The functions here just read
+# the RDS files in "data/".
+
 library(cranlogs)
 library(dplyr)
 library(gh)
 library(jsonlite)
 library(openalexR)
 
-get_number_of_citations <- function(pkg) {
-  doi <- switch(
+####### Helper functions
+
+# Get the DOI for a given package.
+.package_doi <- function(pkg) {
+  switch(
     pkg,
     "palaeoverse" = "10.1111/2041-210x.14099",
     "rmacrostrat" = "10.1130/GES02815.1",
@@ -13,187 +26,200 @@ get_number_of_citations <- function(pkg) {
     "sepkoski" = "10.5281/zenodo.7342194",
     stop("unreachable")
   )
-  citations_raw <- oa_fetch(entity = "works", doi = doi)
-  sum(citations_raw$cited_by_count)
 }
 
-get_number_of_revdep <- function(pkg) {
-  length(tools:::package_dependencies(pkg, reverse = TRUE, which = "all")[[
-    pkg
-  ]])
+# Takes a vector of events with timestamp (e.g. when were github stars given?) and computes
+# the cumulative sum per day.
+# The `removed` arg is useful for events that subtract from the total instead of
+# adding to it (e.g. when were issues closed?).
+.cumulative_by_day <- function(times, removed = NULL) {
+  times <- times[!is.na(times)]
+  removed <- removed[!is.na(removed)]
+  if (length(times) == 0) {
+    return(NULL)
+  }
+  events <- data.frame(
+    date = as.Date(c(times, removed)),
+    delta = rep(c(1L, -1L), c(length(times), length(removed)))
+  )
+  per_day <- aggregate(delta ~ date, data = events, FUN = sum)
+  per_day <- per_day[order(per_day$date), ]
+  data.frame(
+    date = per_day$date,
+    value = cumsum(per_day$delta)
+  )
 }
 
-### Number of downloads (using a starting date that predates all packages)
-n_downloads <- cranlogs::cran_downloads(
-  packages = c("palaeoverse", "sepkoski", "rphylopic", "rmacrostrat"),
-  from = "2015-01-01",
-  to = Sys.Date()
-)
-
-get_number_of_stars <- function(pkg) {
-  gh(
-    "GET /repos/palaeoverse/{pkg}/stargazers",
-    pkg = pkg,
-    .accept = "application/vnd.github.v3.star+json",
-    .limit = Inf
-  ) |>
-    length()
+# Takes a path to an RDS file that contains pre-computed data (e.g. list of commits)
+# and returns a dataframe with the date and the required column (column name depends
+# on the data we're looking at), renamed to `value` like every other series.
+.get_stored_series <- function(path, pkg, column) {
+  if (!file.exists(path)) {
+    return(NULL)
+  }
+  readRDS(path) |>
+    filter(.data$pkg == .env$pkg) |>
+    select(date, value = all_of(column)) |>
+    arrange(date)
 }
 
-get_number_of_stars_time_series <- function(pkg) {
+####### "Time series" functions
+
+ts_commits <- function(pkg) {
+  .get_stored_series("data/commits.rds", pkg, "value")
+}
+
+ts_loc <- function(pkg) {
+  .get_stored_series("data/git_history.rds", pkg, "loc")
+}
+
+ts_cyclocomp <- function(pkg) {
+  .get_stored_series("data/git_history.rds", pkg, "mean_cyclocomp")
+}
+
+ts_reverse_dependencies <- function(pkg) {
+  .get_stored_series("data/revdeps.rds", pkg, "value")
+}
+
+ts_stars <- function(pkg) {
   stars <- gh(
     "GET /repos/palaeoverse/{pkg}/stargazers",
     pkg = pkg,
     .accept = "application/vnd.github.v3.star+json",
     .limit = Inf
   )
-  tab <- lapply(stars, "[[", "starred_at") |>
-    unlist() |>
-    as.Date() |>
-    table()
-
-  data.frame(
-    date = names(tab),
-    count = as.vector(tab),
-    cumul = cumsum(as.vector(tab))
-  )
+  .cumulative_by_day(vapply(stars, function(x) x$starred_at, character(1)))
 }
 
-get_number_of_commits_time_series <- function(pkg) {
+ts_forks <- function(pkg) {
+  forks <- gh(
+    "GET /repos/palaeoverse/{pkg}/forks",
+    pkg = pkg,
+    .limit = Inf
+  )
+  .cumulative_by_day(vapply(forks, function(x) x$created_at, character(1)))
+}
+
+# Issues open on a given day: an issue adds to the total when it is opened and
+# takes away from it when it is closed. The issues endpoint returns pull
+# requests too, so entries carrying a `pull_request` field are dropped to count
+# genuine issues only.
+ts_open_issues <- function(pkg) {
+  issues <- gh(
+    "GET /repos/palaeoverse/{pkg}/issues?state=all",
+    pkg = pkg,
+    .limit = Inf
+  ) |>
+    Filter(f = function(x) is.null(x$pull_request))
+
+  out <- .cumulative_by_day(
+    times = vapply(issues, function(x) x$created_at, character(1)),
+    removed = vapply(
+      issues,
+      function(x) x$closed_at %||% NA_character_,
+      character(1)
+    )
+  )
+  if (is.null(out)) {
+    0
+  } else {
+    out
+  }
+}
+
+ts_pull_requests <- function(pkg) {
+  prs <- gh(
+    "GET /repos/palaeoverse/{pkg}/pulls?state=all",
+    pkg = pkg,
+    .limit = Inf
+  )
+  .cumulative_by_day(vapply(prs, function(x) x$created_at, character(1)))
+}
+
+ts_open_pull_requests <- function(pkg) {
+  open_prs <- gh(
+    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
+    pkg = pkg,
+    .limit = Inf
+  ) |>
+    Filter(f = function(x) is.null(x$pull_request))
+
+  out <- .cumulative_by_day(
+    times = vapply(open_prs, function(x) x$created_at, character(1)),
+    removed = vapply(
+      open_prs,
+      function(x) x$closed_at %||% NA_character_,
+      character(1)
+    )
+  )
+  if (is.null(out)) {
+    0
+  } else {
+    out
+  }
+}
+
+# A commit is attributed to a GitHub account when its email is known there, and
+# to the name recorded in the commit otherwise.
+.commit_author <- function(x) {
+  x$author$login %||% x$commit$author$name
+}
+
+# This is the cumulative sum of unique commit authors.
+ts_contributors <- function(pkg) {
   commits <- gh(
     "GET /repos/palaeoverse/{pkg}/commits",
     pkg = pkg,
     .limit = Inf
   )
-  dates <- vapply(commits, function(x) x$commit$author$date, character(1))
-  tab <- as.Date(dates) |>
-    table()
-
-  data.frame(
-    date = as.Date(names(tab)),
-    count = as.vector(tab),
-    cumul = cumsum(as.vector(tab))
-  )
-}
-
-# ---------------------------------------------------------------------------
-# Incremental collectors
-#
-# The three expensive series (commits, LOC, cyclomatic complexity) support
-# appending only the newest data instead of recomputing from scratch. The
-# `update_*()` functions take the previously stored data frame and return the
-# full, updated series. The most recent stored day is always re-collected
-# because it may have gained commits since the last run.
-# ---------------------------------------------------------------------------
-
-# Per-day commit counts from the GitHub API, optionally only since a given date
-.commits_by_day <- function(pkg, since = NULL) {
-  args <- list(
-    "GET /repos/palaeoverse/{pkg}/commits",
-    pkg = pkg,
-    .limit = Inf
-  )
-  if (!is.null(since)) {
-    args$since <- format(
-      as.POSIXct(paste(since, "00:00:00"), tz = "UTC"),
-      "%Y-%m-%dT%H:%M:%SZ"
-    )
-  }
-  commits <- do.call(gh, args)
-  if (!length(commits)) {
-    return(data.frame(date = as.Date(character()), count = integer()))
-  }
-  dates <- as.Date(vapply(
+  who <- vapply(commits, .commit_author, character(1))
+  when <- as.Date(vapply(
     commits,
     function(x) x$commit$author$date,
     character(1)
   ))
-  tab <- table(dates)
-  data.frame(date = as.Date(names(tab)), count = as.vector(tab))
+
+  keep <- !grepl("dependabot", who)
+  joined <- tapply(when[keep], who[keep], min)
+  .cumulative_by_day(as.Date(joined))
 }
 
-update_commits_time_series <- function(existing = NULL, pkg) {
-  since <- if (is.null(existing) || !nrow(existing)) {
-    NULL
-  } else {
-    max(existing$date)
+ts_citations <- function(pkg) {
+  work <- oa_fetch(entity = "works", doi = .package_doi(pkg))
+  if (is.null(work)) {
+    return(NULL)
   }
-  new <- .commits_by_day(pkg, since = since)
 
-  # Keep everything strictly before `since`; the partial last day is refetched
-  base <- if (is.null(since)) {
-    NULL
-  } else {
-    existing[existing$date < since, c("date", "count")]
-  }
-  combined <- rbind(base, new)
-  combined <- aggregate(count ~ date, data = combined, FUN = sum)
-  combined <- combined[order(combined$date), ]
-  combined$cumul <- cumsum(combined$count)
-  rownames(combined) <- NULL
-  combined
-}
-
-get_number_of_forks <- function(pkg) {
-  gh(
-    "GET /repos/palaeoverse/{pkg}/forks",
-    pkg = pkg,
-    .accept = "application/vnd.github.v3.star+json",
-    .limit = Inf
-  ) |>
-    length()
-}
-
-get_number_of_prs <- function(pkg, state = c("all", "open", "closed")) {
-  gh(
-    "GET /repos/palaeoverse/{pkg}/pulls?state={state}",
-    pkg = pkg,
-    state = state,
-    .accept = "application/vnd.github.v3.star+json",
-    .limit = Inf
-  ) |>
-    length()
-}
-
-# The issues endpoint returns pull requests too, so drop entries that carry a
-# `pull_request` field to count genuine issues only.
-get_number_of_open_issues <- function(pkg) {
-  issues <- gh(
-    "GET /repos/palaeoverse/{pkg}/issues?state=open",
-    pkg = pkg,
-    .limit = Inf
-  )
-  sum(vapply(issues, function(x) is.null(x$pull_request), logical(1)))
-}
-
-get_number_of_unique_contributors <- function(pkg) {
-  gh(
-    "GET /repos/palaeoverse/{pkg}/contributors",
-    pkg = pkg,
-    .accept = "application/vnd.github+json",
-    .limit = Inf
-  ) |>
-    length()
-}
-
-# get_number_of_unique_people <- function(pkg) {}
-
-get_number_of_loc <- function(pkg) {
-  system(
-    paste0(
-      "git clone https://github.com/palaeoverse/",
-      pkg,
-      " --depth=1 -q -c advice.detachedHead=false"
-    ),
+  # `cites` takes the short work id ("W..."), not the full OpenAlex URL.
+  citing <- oa_fetch(
+    entity = "works",
+    cites = basename(work$id),
+    options = list(select = "publication_date")
   )
 
-  out <- loc::count_loc()
-  fs::dir_delete(pkg)
-  out
+  .cumulative_by_day(citing$publication_date)
 }
 
+ts_downloads <- function(pkg) {
+  first_cran_release <- ts_cran_releases(pkg)[1, "date"]
+  dl <- cran_downloads(pkg, from = first_cran_release, to = Sys.Date())
+  dl$value <- cumsum(dl$count)
+  rownames(dl) <- NULL
+  dl
+}
 
-get_coverage_time_series <- function(
+ts_cran_releases <- function(pkg) {
+  timeline <- jsonlite::fromJSON(paste0(
+    "https://crandb.r-pkg.org/",
+    pkg,
+    "/all"
+  ))$timeline
+
+  dates <- sort(as.Date(substr(unlist(timeline), 1, 10)))
+  data.frame(date = dates, value = seq_along(dates))
+}
+
+ts_coverage <- function(
   pkg,
   owner = "palaeoverse",
   branch = NULL,
@@ -236,19 +262,140 @@ get_coverage_time_series <- function(
   )
 
   ord <- order(date)
-  data.frame(
-    date = date[ord],
-    coverage = coverage[ord]
+  data.frame(date = date[ord], value = coverage[ord])
+}
+
+# Every metric that has a history, in the order the download file lists them.
+time_series <- list(
+  commits = ts_commits,
+  contributors = ts_contributors,
+  forks = ts_forks,
+  open_issues = ts_open_issues,
+  pull_requests = ts_pull_requests,
+  open_pull_requests = ts_open_pull_requests,
+  lines_of_code = ts_loc,
+  cran_releases = ts_cran_releases,
+  code_coverage = ts_coverage,
+  mean_cyclomatic_complexity = ts_cyclocomp,
+  cran_downloads = ts_downloads,
+  github_stars = ts_stars,
+  citations = ts_citations,
+  reverse_dependencies = ts_reverse_dependencies
+)
+
+# Every series of one package, computed once per session: the overview page and
+# the package's own tab ask for the same numbers, and each series costs a round
+# trip (or several) to an API.
+.series_cache <- new.env(parent = emptyenv())
+
+package_time_series <- function(pkg) {
+  if (is.null(.series_cache[[pkg]])) {
+    .series_cache[[pkg]] <- lapply(time_series, function(f) f(pkg))
+  }
+  .series_cache[[pkg]]
+}
+
+
+####### "Latest" functions
+
+# Helper function to quickly get the latest observation in a time series, e.g.
+# get_latest(pkg, "cran_downloads")
+get_latest <- function(pkg, metric) {
+  if (!metric %in% names(time_series)) {
+    stop("unknown metric: ", metric)
+  }
+  series <- package_time_series(pkg)[[metric]]
+  if (!NROW(series)) {
+    return(NA)
+  }
+  series$value[which.max(series$date)]
+}
+
+# Date of the last CRAN release, and how long ago that was (in weeks)
+latest_release <- function(pkg) {
+  releases <- package_time_series(pkg)[["cran_releases"]]
+  date <- max(releases$date)
+  list(
+    date = as.character(date),
+    n_weeks = round(
+      as.vector(difftime(
+        as.POSIXct(Sys.Date()),
+        as.POSIXct(date),
+        units = "weeks"
+      )),
+      1
+    )
   )
 }
 
-get_coverage_by_file <- function(
+# Pull requests carry their creation date but not the day they were closed, so
+# how many are open is a "now" number, not the last point of a series.
+latest_open_prs <- function(pkg) {
+  gh(
+    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
+    pkg = pkg,
+    .limit = Inf
+  ) |>
+    length()
+}
+
+latest_cran_checks <- function(pkg) {
+  url <- sprintf(
+    "https://cloud.r-project.org/web/checks/check_results_%s.html",
+    pkg
+  )
+  html_page <- xml2::read_html(url)
+  html_table <- rvest::html_table(html_page)
+  check_status <- html_table[[1]]$Status
+
+  if (all(check_status == "OK")) {
+    return("<span style=\"color: #00b300\">OK</span>")
+  }
+
+  counts <- list(
+    list(n = sum(check_status == "NOTE"), label = "Note", color = "blue"),
+    list(
+      n = sum(check_status %in% c("WARN", "WARNING")),
+      label = "Warning",
+      color = "orange"
+    ),
+    list(n = sum(check_status == "ERROR"), label = "Error", color = "red")
+  )
+
+  parts <- vapply(
+    Filter(function(x) x$n > 0, counts),
+    function(x) {
+      paste0(
+        "<span style=\"color: ",
+        x$color,
+        "\">",
+        x$n,
+        " ",
+        x$label,
+        if (x$n > 1) "s" else "",
+        "</span>"
+      )
+    },
+    character(1)
+  )
+
+  paste0(
+    "<a href=\"",
+    url,
+    "\" target=\"_blank\">",
+    paste(parts, collapse = ", "),
+    "</a>"
+  )
+}
+
+# Codecov provides the history of total coverage, or the latest coverage broken
+# down by file, but no per-file coverage history.
+latest_coverage_by_file <- function(
   pkg,
   owner = "palaeoverse",
   branch = NULL,
   token = Sys.getenv("CODECOV_TOKEN")
 ) {
-  # The /totals/ endpoint returns the latest coverage totals broken down by file
   resp <- httr2::request("https://api.codecov.io") |>
     httr2::req_url_path("api/v2/github", owner, "repos", pkg, "totals/") |>
     httr2::req_url_query(branch = branch) |>
@@ -272,90 +419,11 @@ get_coverage_by_file <- function(
     (\(d) d[order(d$coverage), ])()
 }
 
-# Last commit of each day (>= `since`), oldest first. `git_log()` lists newest
-# first, so the first commit seen for a date is that day's last commit.
-.commit_days <- function(repo, since = NULL) {
-  log <- gert::git_log(repo = repo, max = .Machine$integer.max)
-  date <- as.Date(log$time)
-  keep <- !duplicated(date)
-  cm <- log$commit[keep]
-  date <- date[keep]
-  if (!is.null(since)) {
-    sel <- date >= since
-    cm <- cm[sel]
-    date <- date[sel]
-  }
-  ord <- order(date)
-  list(commits = cm[ord], dates = date[ord])
-}
-
-# LOC *and* cyclomatic complexity at each commit-day, computed in a single clone
-# and a single checkout pass (both walk the same history). `since` restricts the
-# walk to the recent tail so incremental updates only re-check out new days.
-get_git_history_stats <- function(pkg, since = NULL) {
-  repo <- gert::git_clone(
-    paste0("https://github.com/palaeoverse/", pkg),
-    pkg,
-    verbose = FALSE
-  )
-  on.exit(fs::dir_delete(pkg), add = TRUE)
-
-  cd <- .commit_days(repo, since = since)
-  if (!length(cd$commits)) {
-    return(data.frame(
-      date = as.Date(character()),
-      loc = numeric(),
-      n_functions = integer(),
-      cyclocomp = numeric(),
-      mean_cyclocomp = numeric()
-    ))
-  }
-
-  rows <- lapply(seq_along(cd$commits), function(i) {
-    message("[", pkg, "] processing ", cd$dates[i])
-    gert::git_reset_hard(cd$commits[[i]], repo = repo)
-    cc <- cyclocomp_from_source(pkg)$complexity
-    data.frame(
-      date = cd$dates[i],
-      loc = sum(loc::count_loc(pkg)$code),
-      n_functions = length(cc),
-      cyclocomp = sum(cc, na.rm = TRUE),
-      mean_cyclocomp = if (length(cc)) mean(cc, na.rm = TRUE) else NA_real_
-    )
-  })
-  do.call(rbind, rows)
-}
-
-# Append newest commit-days to a previously stored git-history data frame
-update_git_history_stats <- function(existing = NULL, pkg) {
-  since <- if (is.null(existing) || !nrow(existing)) {
-    NULL
-  } else {
-    max(existing$date)
-  }
-  new <- get_git_history_stats(pkg, since = since)
-
-  base <- if (is.null(since)) {
-    NULL
-  } else {
-    existing[existing$date < since, , drop = FALSE]
-  }
-  combined <- rbind(base, new)
-  combined <- combined[order(combined$date), ]
-  rownames(combined) <- NULL
-  combined
-}
-
-# Backwards-compatible full-history wrappers (since = NULL) -----------------
-get_number_of_loc_time_series <- function(pkg) {
-  get_git_history_stats(pkg)[c("date", "loc")]
-}
-
-# Cyclomatic complexity of every function in a package's source directory,
-# WITHOUT installing it. `cyclocomp::cyclocomp_package()` needs the package
-# installed only because it uses `get()` to retrieve each function object; but
-# defining a function never evaluates its body, so we can parse the `R/` files,
-# `eval()` just the function definitions, and run `cyclocomp()` on each.
+# Cyclomatic complexity of every function in a package's source directory.
+# `cyclocomp::cyclocomp_package()` cannot be used here because it requires the
+# package to be installed, which would take very long since we want to make a
+# time series of cyclomatic complexity.
+# This version doesn't require installing the package.
 cyclocomp_from_source <- function(dir) {
   r_files <- list.files(
     file.path(dir, "R"),
@@ -399,8 +467,8 @@ cyclocomp_from_source <- function(dir) {
   data.frame(function_name = names, complexity = complexity)
 }
 
-# Cyclomatic complexity of each function at the current HEAD of a package
-get_cyclocomp_by_function <- function(pkg) {
+# We're probably only interested in the average complexity over time, not by function.
+latest_cyclocomp_by_function <- function(pkg) {
   gert::git_clone(
     paste0("https://github.com/palaeoverse/", pkg),
     pkg,
@@ -413,136 +481,31 @@ get_cyclocomp_by_function <- function(pkg) {
   cc[order(cc$complexity, decreasing = TRUE), ]
 }
 
-get_cyclocomp_time_series <- function(pkg) {
-  get_git_history_stats(pkg)[
-    c("date", "n_functions", "cyclocomp", "mean_cyclocomp")
-  ]
-}
+####### Badges
 
-get_last_release_info <- function(pkg) {
-  cran_page <- readLines(paste0(
-    "https://cran.r-project.org/web/packages/",
-    pkg,
-    "/index.html"
-  ))
-  date <- cran_page[which(startsWith(cran_page, "<td>Published")) + 1]
-  date <- gsub("<td>", "", date)
-  date <- gsub("</td>", "", date)
-  n_weeks <- round(
-    as.vector(difftime(
-      as.POSIXct(Sys.Date()),
-      as.POSIXct(date),
-      units = "weeks"
-    )),
-    1
-  )
-  data.frame(
-    pkg = pkg,
-    date_last_release = date,
-    n_weeks_last_release = n_weeks
-  )
-}
-
-get_number_of_downloads <- function(pkg) {
-  # cran_downloads() doesn't have an easy way to get downloads for all time so
-  # we use an arbitrary too early date
-  dl <- cran_downloads(pkg, from = "2001-01-01", to = Sys.Date())
-  sum(dl$count)
-}
-
-get_number_of_downloads_time_series <- function(pkg) {
-  dl <- cran_downloads(pkg, from = "2001-01-01", to = Sys.Date())
-  dl$cumul <- cumsum(dl$count)
-  # drop all periods before any download occurred
-  dl <- dl[dl$cumul != 0, ]
-  dl
-}
-
-get_cran_checks <- function(pkg) {
-  url <- sprintf(
-    "https://cloud.r-project.org/web/checks/check_results_%s.html",
-    pkg
-  )
-  html_page <- xml2::read_html(url)
-  html_table <- rvest::html_table(html_page)
-  check_status <- html_table[[1]]$Status
-
-  if (all(check_status == "OK")) {
-    return("<span style=\"color: #00b300\">OK</span>")
-  }
-
-  n_notes <- length(which(check_status == "NOTE"))
-  n_warnings <- length(which(check_status %in% c("WARN", "WARNING")))
-  n_errors <- length(which(check_status == "ERROR"))
-
-  if (n_notes > 0) {
-    note <- paste0(
-      "<span style=\"color: blue\">",
-      n_notes,
-      " Note",
-      if (n_notes > 1) "s" else "",
-      "</span>"
-    )
-  } else {
-    note <- NULL
-  }
-
-  if (n_warnings > 0) {
-    warning <- paste0(
-      "<span style=\"color: orange\">",
-      n_warnings,
-      " Warning",
-      if (n_warnings > 1) "s" else "",
-      "</span>"
-    )
-  } else {
-    warning <- NULL
-  }
-
-  if (n_errors > 0) {
-    error <- paste0(
-      "<span style=\"color: red\">",
-      n_errors,
-      " Error",
-      if (n_errors > 1) "s" else "",
-      "</span>"
-    )
-  } else {
-    error <- NULL
-  }
-
-  out <- paste0(
-    "<a href=\"",
-    url,
-    "\" target=\"_blank\">",
-    paste(c(note, warning, error), collapse = ", "),
-    "</a>"
-  )
-
-  out
-}
-
-get_ci_status <- function(pkg) {
+.badge <- function(pkg, workflow) {
   paste0(
     "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
     pkg,
-    "/actions?query=workflow%3AR-CMD-check+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
+    "/actions?query=workflow%3A",
+    sub("\\.yaml$", "", workflow),
+    "+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
-    "/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main\"></a>"
+    "/actions/workflows/",
+    workflow,
+    "/badge.svg?branch=main\"></a>"
   )
 }
 
-get_pkgdown_status <- function(pkg) {
-  paste0(
-    "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
-    pkg,
-    "/actions?query=workflow%3Apkgdown+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
-    pkg,
-    "/actions/workflows/pkgdown.yaml/badge.svg?branch=main\"></a>"
-  )
+badge_ci <- function(pkg) {
+  .badge(pkg, "R-CMD-check.yaml")
 }
 
-get_coverage <- function(pkg) {
+badge_pkgdown <- function(pkg) {
+  .badge(pkg, "pkgdown.yaml")
+}
+
+badge_coverage <- function(pkg) {
   paste0(
     "<a rel=\"noopener\" target=\"_blank\" href=\"https://codecov.io/gh/palaeoverse/",
     pkg,

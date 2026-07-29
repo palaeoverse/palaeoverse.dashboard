@@ -5,6 +5,8 @@ on:
       - 'index.qmd'
       - '_package.qmd'
       - 'stats.R'
+      - 'downloads.R'
+      - 'downloads.js'
       - 'data/**'
       - '_brand/**'
       - 'custom.scss'

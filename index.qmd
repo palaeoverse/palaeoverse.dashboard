@@ -26,6 +26,12 @@ source("stats.R")
 
 fmt <- function(x) format(x, big.mark = ",")
 
+# One value box of a package tab. They all have the same shape: a title, an
+# icon, and the current value of one metric.
+vbox <- function(title, icon, value) {
+  list(title = title, icon = icon, color = "primary", value = fmt(value))
+}
+
 # One "icon + value + label" stat, shown in the overview card's stats grid.
 overview_stat <- function(icon, value, label) {
   paste0(
@@ -45,48 +51,40 @@ overview_stat <- function(icon, value, label) {
 # The card itself and its header (the package name) are provided by the
 # dashboard cell + its `title` option.
 overview_card <- function(pkg) {
-  last_release_info <- get_last_release_info(pkg)
+  last_release <- latest_release(pkg)
   htmltools::HTML(paste0(
     "<div class=\"overview-cran\"><strong>CRAN checks:</strong> ",
-    get_cran_checks(pkg),
+    latest_cran_checks(pkg),
     "</div>",
     "<span class=\"last-cran-update\"><strong>Last CRAN release:</strong><br>",
-    last_release_info[["date_last_release"]],
+    last_release[["date"]],
     " (",
-    last_release_info[["n_weeks_last_release"]],
+    last_release[["n_weeks"]],
     " weeks ago) ",
     "</span>",
     "<div class=\"overview-badges\">",
     "<span>",
-    get_ci_status(pkg),
+    badge_ci(pkg),
     "</span>",
     "<span>",
-    get_coverage(pkg),
+    badge_coverage(pkg),
     "</span>",
     "<span>",
-    get_pkgdown_status(pkg),
+    badge_pkgdown(pkg),
     "</span>",
     "</div>",
     "<div class=\"overview-stats\">",
     "<div class=\"overview-stats-row\">",
-    overview_stat(
-      "people",
-      get_number_of_unique_contributors(pkg),
-      "contributors"
-    ),
-    overview_stat("diagram-2", get_number_of_forks(pkg), "forks"),
+    overview_stat("people", get_latest(pkg, "contributors"), "contributors"),
+    overview_stat("diagram-2", get_latest(pkg, "forks"), "forks"),
     "</div>",
     "<div class=\"overview-stats-row\">",
     overview_stat(
       "exclamation-circle",
-      get_number_of_open_issues(pkg),
+      get_latest(pkg, "open_issues"),
       "open issues"
     ),
-    overview_stat(
-      "git",
-      get_number_of_prs(pkg, state = "open"),
-      "open PRs"
-    ),
+    overview_stat("git", latest_open_prs(pkg), "open PRs"),
     "</div>",
     "</div>"
   ))

@@ -4,16 +4,13 @@ and produces the same layout and output types for all tabs.
 -->
 
 ```{r}
-all_stats <- universe::universe_one_package("palaeoverse", pkg)
+# Every metric that has a time series. 
+series <- package_time_series(pkg)
 
-n_downloads <- get_number_of_downloads(pkg)
-n_stars <- all_stats[["_stars"]]
-n_forks <- get_number_of_forks(pkg)
-n_prs <- get_number_of_prs(pkg, state = "all")
-n_citations <- get_number_of_citations(pkg)
-n_revdep <- get_number_of_revdep(pkg)
-n_contributors <- length(all_stats[["_contributors"]])
-last_release <- get_last_release_info(pkg)
+# Those don't have an associated time series.
+cov_by_file <- latest_coverage_by_file(pkg)
+cyclocomp_by_function <- latest_cyclocomp_by_function(pkg)
+last_release <- latest_release(pkg)
 ```
 
 
@@ -28,57 +25,44 @@ last_release <- get_last_release_info(pkg)
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Number of contributors",
-  icon = "people",
-  color = "primary",
-  value = n_contributors
-)
+vbox("Number of contributors", "people", get_latest(pkg, "contributors"))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Number of forks",
-  color = "primary",
-  icon = "diagram-2",
-  value = n_forks
-)
+vbox("Number of forks", "diagram-2", get_latest(pkg, "forks"))
 ```
 
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Number of pull requests",
-  color = "primary",
-  icon = "git",
-  value = n_prs
-)
+vbox("Number of open issues", "exclamation-circle", get_latest(pkg, "open_issues"))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Weeks since last CRAN update",
-  color = "primary",
-  icon = "arrow-counterclockwise",
-  value = last_release[["n_weeks_last_release"]]
+vbox("Number of open pull requests", "git", get_latest(pkg, "open_pull_requests"))
+```
+
+```{r}
+#| content: valuebox
+#| expandable: false
+vbox(
+  "Weeks since last CRAN update",
+  "arrow-counterclockwise",
+  last_release[["n_weeks"]]
 )
 ```
 
 ###### Row
 
 ```{r}
-n_commits <- readRDS("data/commits.rds")
-n_commits <- n_commits |> filter(pkg == .env$pkg)
-
-n_commits |>
+series$commits |>
   e_charts(x = date) |>
-  e_line(serie = cumul, name = "Cumulative number") |>
+  e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
@@ -87,12 +71,9 @@ n_commits |>
 
 
 ```{r}
-n_loc <- readRDS("data/git_history.rds")
-n_loc <- n_loc |> filter(pkg == .env$pkg)
-
-n_loc |>
+series$lines_of_code |>
   e_charts(x = date) |>
-  e_line(serie = loc, name = "Number of lines of code") |>
+  e_line(serie = value, name = "Number of lines of code") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
@@ -105,11 +86,9 @@ n_loc |>
 ###### Row
 
 ```{r}
-code_cov <- get_coverage_time_series(pkg)
-
-code_cov |>
+series$code_coverage |>
   e_charts(x = date) |>
-  e_line(serie = coverage, name = "Code coverage") |>
+  e_line(serie = value, name = "Code coverage") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
@@ -117,12 +96,9 @@ code_cov |>
 ```
 
 ```{r}
-cyclocomp <- readRDS("data/git_history.rds")
-cyclocomp <- cyclocomp |> filter(pkg == .env$pkg)
-
-cyclocomp |>
+series$mean_cyclomatic_complexity |>
   e_charts(x = date) |>
-  e_line(serie = mean_cyclocomp, name = "Average cyclomatic complexity") |>
+  e_line(serie = value, name = "Average cyclomatic complexity") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
@@ -133,8 +109,6 @@ cyclocomp |>
 ###### Row
 
 ```{r}
-cov_by_file <- get_coverage_by_file(pkg)
-
 cov_by_file |>
   reactable(
     columns = list(
@@ -154,8 +128,6 @@ cov_by_file |>
 ```
 
 ```{r}
-cyclocomp_by_function <- get_cyclocomp_by_function(pkg)
-
 cyclocomp_by_function |>
   reactable(
     columns = list(
@@ -175,58 +147,39 @@ cyclocomp_by_function |>
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "CRAN downloads",
-  value = fmt(n_downloads),
-  icon = "cloud-download",
-  color = "primary"
-)
+vbox("CRAN downloads", "cloud-download", get_latest(pkg, "cran_downloads"))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "GitHub stars",
-  value = fmt(n_stars),
-  icon = "star",
-  color = "primary"
-)
+vbox("GitHub stars", "star", get_latest(pkg, "github_stars"))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Citations",
-  value = fmt(n_citations),
-  icon = "book",
-  color = "primary"
-)
+vbox("Citations", "book", get_latest(pkg, "citations"))
 ```
 
 ```{r}
 #| content: valuebox
 #| expandable: false
-list(
-  title = "Reverse dependencies",
-  value = fmt(n_revdep),
-  icon = "arrow-down",
-  color = "primary"
+vbox(
+  "Reverse dependencies",
+  "arrow-down",
+  get_latest(pkg, "reverse_dependencies")
 )
 ```
 
 ###### Row
 
 ```{r}
-cran_dl <- get_number_of_downloads_time_series(pkg)
-
-cran_dl |>
-  filter(
-    (as.numeric(gsub("\\d{4}-\\d{2}-(\\d{2})", "\\1", date)) %% 7) == 0
-  ) |>
+# One point a week is plenty for a series this long, and much lighter to draw
+series$cran_downloads |>
+  slice(seq(1, n(), by = 7)) |>
   e_charts(x = date) |>
-  e_line(serie = cumul, name = "Cumulative number") |>
+  e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
@@ -235,11 +188,9 @@ cran_dl |>
 
 
 ```{r}
-stars <- get_number_of_stars_time_series(pkg)
-
-stars |>
+series$github_stars |>
   e_charts(x = date) |>
-  e_line(serie = cumul, name = "Cumulative number") |>
+  e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
