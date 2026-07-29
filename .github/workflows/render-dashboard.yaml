@@ -1,15 +1,6 @@
 on:
   push:
     branches: [main]
-    paths:
-      - 'index.qmd'
-      - '_package.qmd'
-      - 'stats.R'
-      - 'data/**'
-      - '_brand/**'
-      - 'custom.scss'
-      # Declares data/metrics.csv as a site resource, so it changes the output
-      - '_quarto.yml'
   schedule:
     - cron: "0 6 * * *"   # daily, after the data refresh
   workflow_dispatch:
