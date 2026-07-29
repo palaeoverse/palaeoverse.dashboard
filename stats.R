@@ -296,6 +296,31 @@ package_time_series <- function(pkg) {
 }
 
 
+####### Youtube lecture series
+
+# Views of the recorded talks of the Palaeoverse lecture series, collected by
+# fetch.R (see `update_youtube_views()` there) into "data/youtube.rds", one row
+# per day and per video. This belongs to the organisation rather than to one
+# package, so these two take no `pkg` and stay out of `time_series` above: every
+# package tab shows the same number.
+ts_youtube_views <- function() {
+  if (!file.exists("data/youtube.rds")) {
+    return(NULL)
+  }
+  readRDS("data/youtube.rds") |>
+    summarize(value = sum(views, na.rm = TRUE), .by = date) |>
+    arrange(date)
+}
+
+latest_youtube_views <- function() {
+  views <- ts_youtube_views()
+  if (!NROW(views)) {
+    return(NA)
+  }
+  views$value[which.max(views$date)]
+}
+
+
 ####### "Latest" functions
 
 # Helper function to quickly get the latest observation in a time series, e.g.

@@ -5,11 +5,11 @@ on:
       - 'index.qmd'
       - '_package.qmd'
       - 'stats.R'
-      - 'downloads.R'
-      - 'downloads.js'
       - 'data/**'
       - '_brand/**'
       - 'custom.scss'
+      # Declares data/metrics.csv as a site resource, so it changes the output
+      - '_quarto.yml'
   schedule:
     - cron: "0 6 * * *"   # daily, after the data refresh
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
   render-dashboard:
     runs-on: ubuntu-latest
     env:
-      # Authenticated GitHub API calls (gh::gh(), universe) get a higher rate limit
+      # Authenticated GitHub API calls (gh::gh()) get a higher rate limit
       GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
       # Codecov API access for coverage/cyclomatic-complexity stats (stats.R)
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

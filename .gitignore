@@ -3,9 +3,6 @@
 
 _site/
 
-# generated at render time by downloads.R
-_downloads.html
-
 ## https://github.com/github/gitignore/blob/master/R.gitignore
 # History files
 .Rhistory

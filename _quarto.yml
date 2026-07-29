@@ -1,2 +1,7 @@
 project:
   type: website
+  # Published next to the dashboard so that the "Download data" button of the
+  # navbar serves it from the same origin, which is what makes the click
+  # download the file instead of displaying it.
+  resources:
+    - data/metrics.csv

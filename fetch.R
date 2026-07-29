@@ -140,7 +140,7 @@ update_commits_time_series <- function(existing = NULL, pkg) {
 
 # Last commit of each day (>= `since`), oldest first. `git_log()` lists newest
 # first, so the first commit seen for a date is that day's last commit.
-.commit_days <- function(repo) {
+.commit_days <- function(repo, since = NULL) {
   log <- gert::git_log(repo = repo, max = .Machine$integer.max)
   date <- as.Date(log$time)
   keep <- !duplicated(date)
@@ -211,6 +211,110 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   combined
 }
 
+####### Youtube views of the lecture series
+
+# The talks of the Palaeoverse lecture series are recorded and put on Youtube.
+# The list of talks is maintained in a public Google Sheet, one row per talk,
+# with the link to the recording in the "Youtube link" column (a talk that
+# wasn't recorded has no link). The sheet is public, so it can be read without
+# credentials through its CSV export.
+#
+# Note that this is a series for the organisation as a whole, not for one
+# package, so unlike everything else here it is not collected per package.
+.lecture_sheet_csv <- paste0(
+  "https://docs.google.com/spreadsheets/d/",
+  "1-CxROgJQ3MKTpunj429rvh7Q-_XVnnRbK4-HjaNazFI/export?format=csv"
+)
+
+# The video id of every recorded talk. Links are written by hand and some of
+# them carry extra query parameters ("&pp=..."), hence matching the id rather
+# than stripping the prefix.
+.lecture_video_ids <- function() {
+  links <- read.csv(.lecture_sheet_csv)[["Youtube.link"]]
+  links <- links[!is.na(links) & nzchar(links)]
+  unique(regmatches(links, regexpr("(?<=v=)[A-Za-z0-9_-]+", links, perl = TRUE)))
+}
+
+# Youtube doesn't put the view count in the page itself: it ships the data the
+# player needs as a JSON blob in a <script> tag, and the count is read from
+# there. The official API would need a key and a quota for a number that is
+# right there in the page.
+.youtube_view_count <- function(video_id) {
+  scripts <- rvest::read_html(paste0(
+    "https://www.youtube.com/watch?v=",
+    video_id
+  )) |>
+    rvest::html_elements("script") |>
+    rvest::html_text2()
+
+  js <- scripts[grepl("ytInitialPlayerResponse", scripts, fixed = TRUE)][1]
+  m <- regmatches(js, regexpr('"viewCount"\\s*:\\s*"[0-9]+"', js))
+  if (!length(m)) {
+    return(NA_real_)
+  }
+  as.numeric(gsub("\\D", "", m))
+}
+
+# Today's view count of every recorded talk. A video that cannot be read (page
+# gone, private, Youtube serving something unexpected) contributes NA rather
+# than bringing the whole refresh down.
+.youtube_views_today <- function() {
+  ids <- .lecture_video_ids()
+  views <- vapply(
+    ids,
+    function(id) {
+      message("== youtube views of ", id, " ==")
+      tryCatch(.youtube_view_count(id), error = function(e) NA_real_)
+    },
+    numeric(1)
+  )
+  data.frame(
+    date = Sys.Date(),
+    video_id = ids,
+    views = views,
+    row.names = NULL
+  )
+}
+
+# Youtube only reports how many views a video has *now*, so the history is built
+# one measurement at a time. The refresh runs every 12 hours but a measurement a
+# day is enough, so a day that was already collected is left alone.
+update_youtube_views <- function(existing = NULL) {
+  if (Sys.Date() %in% existing$date) {
+    return(existing)
+  }
+  bind_rows(existing, .youtube_views_today()) |>
+    arrange(date, video_id)
+}
+
+####### Every metric in one file
+
+# The file behind the "Download data" button of the dashboard: every series of
+# every package stacked into one long table, so that computing the change in any
+# metric over any period is a `lag()` away once it is read back. It holds the
+# API-collected series (stars, issues, citations, ...) as well as the ones stored
+# above, which is why it is built here rather than from the files in "data/".
+all_metrics <- function(packages) {
+  rows <- lapply(packages, function(pkg) {
+    message("== ", pkg, " -> data/metrics.csv ==")
+    series <- package_time_series(pkg)
+    lapply(names(series), function(metric) {
+      s <- series[[metric]]
+      # A metric can have no series at all (a package with no fork, no citation
+      # yet, ...); it then contributes no row. `ts_*()` signals that either with
+      # NULL or with the scalar 0, hence the `is.data.frame()` rather than a
+      # plain row count.
+      if (!is.data.frame(s) || nrow(s) == 0) {
+        return(NULL)
+      }
+      data.frame(pkg = pkg, date = s$date, metric = metric, value = s$value)
+    })
+  })
+
+  bind_rows(rows) |>
+    arrange(pkg, metric, date)
+}
+
 ####### Refresh every data file
 
 dir.create("data", showWarnings = FALSE)
@@ -221,8 +325,21 @@ saveRDS(commits, "data/commits.rds")
 git_history <- refresh("data/git_history.rds", update_git_history_stats)
 saveRDS(git_history, "data/git_history.rds")
 
-revdeps <- update_reverse_dependencies(readRDS("data/revdeps.rds"), packages)
+revdeps <- update_reverse_dependencies(
+  # The file doesn't exist yet on the very first run
+  if (file.exists("data/revdeps.rds")) readRDS("data/revdeps.rds") else NULL,
+  packages
+)
 saveRDS(revdeps, "data/revdeps.rds")
+
+youtube <- update_youtube_views(
+  if (file.exists("data/youtube.rds")) readRDS("data/youtube.rds") else NULL
+)
+saveRDS(youtube, "data/youtube.rds")
+
+# Last, because the series it collects include the three files written above
+metrics <- all_metrics(packages)
+write.csv(metrics, "data/metrics.csv", row.names = FALSE)
 
 message(
   "Done. Rows: commits=",
@@ -230,5 +347,9 @@ message(
   ", git_history=",
   nrow(git_history),
   ", revdeps=",
-  nrow(revdeps)
+  nrow(revdeps),
+  ", youtube=",
+  nrow(youtube),
+  ", metrics=",
+  nrow(metrics)
 )

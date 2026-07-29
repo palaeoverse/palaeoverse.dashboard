@@ -18,6 +18,7 @@ jobs:
     env:
       # Authenticated GitHub API calls (higher rate limit) for gh::gh()
       GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
