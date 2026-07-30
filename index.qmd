@@ -162,7 +162,7 @@ pkg <- "rphylopic"
 pkg <- "sepkoski"
 ```
 
-<!-- {{< include _package.qmd >}} -->
+{{< include _package.qmd >}}
 
 
 # Community
