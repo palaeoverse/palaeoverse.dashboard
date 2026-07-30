@@ -30,6 +30,7 @@ library(gh)
 library(cranlogs)
 library(reactable)
 library(echarts4r)
+library(mapgl)
 
 source("stats.R")
 
@@ -101,7 +102,7 @@ overview_card <- function(pkg) {
 ```
 
 
-# Overview
+# Package overview
 
 
 ### Row {.overview-row}
@@ -161,4 +162,10 @@ pkg <- "rphylopic"
 pkg <- "sepkoski"
 ```
 
-{{< include _package.qmd >}}
+<!-- {{< include _package.qmd >}} -->
+
+
+# Community
+
+{{< include _community.qmd >}}
+

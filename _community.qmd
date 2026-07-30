@@ -1,0 +1,266 @@
+
+```{r}
+# Unlike every tab above, this one is about the organisation as a whole rather
+# than about one package: one tab per channel the community is reached through.
+views_by_video <- latest_youtube_views_by_video()
+```
+
+### Column {.tabset}
+
+#### Youtube
+
+##### Column {width="40%"}
+
+```{r}
+#| content: valuebox
+#| expandable: false
+vbox("Views of the lecture series", "youtube", latest_youtube_views())
+```
+
+```{r}
+#| content: valuebox
+#| expandable: false
+vbox("Recorded talks", "camera-video", NROW(views_by_video))
+```
+
+```{r}
+#| content: valuebox
+#| expandable: false
+vbox(
+  "Average views per talk",
+  "bar-chart",
+  round(mean(views_by_video$views, na.rm = TRUE))
+)
+```
+
+##### Column {width="60%"}
+
+```{r}
+# Youtube only reports the views a video has now, so this is a snapshot rather
+# than a series: one point per talk, placed on the day it was published and at
+# the number of views it has reached since. Older talks have had longer to
+# gather views, so the trend along the x axis is expected rather than telling.
+views_by_video |>
+  arrange(published) |> 
+  e_charts(x = published) |>
+  e_line(serie = views, bind = title) |>
+  e_scatter(serie = views, bind = title, symbol_size = 12) |>
+  e_legend(show = FALSE) |>
+  e_tooltip(
+    # `bind` above puts the talk in `params.name`; the point itself is
+    # [publication date, views].
+    formatter = htmlwidgets::JS(
+      # `parseFloat` because echarts4r pads the values to a common width
+      "function(params) {
+         return params.name + '<br/><strong>' + parseFloat(params.value[1]) +
+           '</strong> views since ' + params.value[0];
+       }"
+    ),
+    extraCssText = "max-width: 25rem; white-space: normal;"
+  ) |>
+  e_datazoom(type = "slider") |>
+  e_title("Views per talk", subtext = "By date of publication")
+```
+
+```{r}
+#| title: Views per talk
+views_by_video |>
+  mutate(
+    title = paste0(
+      "<a href=\"https://www.youtube.com/watch?v=",
+      video_id,
+      "\" target=\"_blank\">",
+      htmltools::htmlEscape(title),
+      "</a>"
+    )
+  ) |>
+  select(title, views) |>
+  reactable(
+    columns = list(
+      title = colDef(name = "Talk", html = TRUE),
+      views = colDef(name = "Views")
+    ),
+    defaultSorted = list(views = "desc"),
+    searchable = TRUE,
+    highlight = TRUE
+  )
+```
+
+#### Bluesky
+
+```{r}
+# The feed carries every post ever made, with the date it was written and the
+# likes and reposts it has gathered since (those are the numbers each post has
+# now, not what it had then).
+bsky_all_posts <- bsky_posts()
+
+no_feed <- paste(
+  "No posts collected yet: the Bluesky feed could not be read the last time",
+  "the data was refreshed."
+)
+
+# Posts run long and hold newlines, so both the table and the chart show the
+# opening of a post rather than the whole of it.
+bsky_excerpt <- function(text, n = 140) {
+  flat <- trimws(gsub("\\s+", " ", text))
+  paste0(
+    htmltools::htmlEscape(substr(flat, 1, n)),
+    ifelse(nchar(flat) > n, "…", "")
+  )
+}
+```
+
+##### Row {width="40%"}
+
+```{r}
+#| content: valuebox
+#| expandable: false
+vbox("Followers", "people", latest_bsky("followers"))
+```
+
+```{r}
+#| content: valuebox
+#| expandable: false
+# The profile counter (`latest_bsky("posts")`) also counts replies and the
+# account's reposts of other people's posts, which the feed below leaves out;
+# counting the feed keeps this card and the chart on the same number.
+vbox("Posts", "chat-text", NROW(bsky_all_posts))
+```
+
+##### Row {width="60%"}
+
+```{r}
+#| title: Most popular posts
+bsky_all_posts |>
+    mutate(
+      text = paste0(
+        "<a href=\"",
+        url,
+        "\" target=\"_blank\">",
+        bsky_excerpt(text),
+        "</a>"
+      )
+    ) |>
+    select(date, text, likes, reposts) |>
+    reactable(
+      columns = list(
+        date = colDef(name = "Date", maxWidth = 110),
+        text = colDef(name = "Post", html = TRUE),
+        likes = colDef(name = "Likes", maxWidth = 90),
+        reposts = colDef(name = "Reposts", maxWidth = 100)
+      ),
+      defaultSorted = list(likes = "desc"),
+      searchable = TRUE,
+      highlight = TRUE
+    )
+```
+
+```{r}
+bsky_all_posts |>
+    count(date, name = "n_posts") |>
+    arrange(date) |>
+    mutate(posts = cumsum(n_posts)) |>
+    e_charts(x = date) |>
+    e_line(serie = posts, name = "Posts") |>
+    e_legend(show = FALSE) |>
+    e_tooltip(trigger = "axis") |>
+    e_datazoom(type = "slider") |>
+    e_title(
+      "Posts over time",
+      subtext = "Cumulative, excluding replies and reposts"
+    )
+```
+
+#### Website
+
+```{r}
+# Visits to palaeoverse.org and its subdomains over the past month, as reported
+# by GoatCounter. "Visitors" rather than pageviews: GoatCounter counts a person
+# once per page per day.
+site_pages <- website_pages()
+site_countries <- .website_stats()$countries
+# First day of the window covered, as "5 July 2026"
+website_since <- function() {
+  since <- .website_stats()$since
+  if (is.null(since)) {
+    return(NULL)
+  }
+  format(since, "%e %B %Y") |> trimws()
+}
+site_period <- paste("Past 30 days, since", website_since())
+
+missing_token <- paste(
+  "No data collected yet. The GoatCounter API needs a token with the",
+  "\"read statistics\" permission, passed to fetch.R as GOATCOUNTER_TOKEN."
+)
+```
+
+##### Column {width="50%"}
+
+```{r}
+#| title: Most visited pages
+table <- site_pages |>
+    mutate(
+      # The scheme is the same on every row and only takes up width
+      url = paste0(
+        "<a href=\"",
+        url,
+        "\" target=\"_blank\">",
+        htmltools::htmlEscape(sub("^https://", "", url)),
+        "</a>"
+      )
+    ) |>
+    select(url, title, visitors) |>
+    reactable(
+      columns = list(
+        url = colDef(name = "Page", html = TRUE),
+        title = colDef(name = "Title"),
+        visitors = colDef(name = "Visitors")
+      ),
+      defaultSorted = list(visitors = "desc"),
+      searchable = TRUE,
+      highlight = TRUE
+    )
+  # The chart on the right says which period it covers in its subtitle; this
+  # card has a table rather than a chart, so the same note goes above it.
+  htmltools::tagList(
+    htmltools::tags$p(site_period, class = "card-note"),
+    table
+  )
+
+```
+
+##### Column {width="50%"}
+
+```{r}
+#| title: Visitors by country
+  countries_map <- website_countries_map()
+  scale <- interpolate_palette(
+    data = countries_map,
+    column = "visitors",
+    method = "quantile",
+    n = 4,
+    palette = colorRampPalette(c("#E0F2FA", "#64BDD8", "#0D725A"))
+  )
+
+  maplibre(
+    style = carto_style("positron"),
+    projection = "mercator"
+  ) |>
+    add_fill_layer(
+      id = "countries",
+      source = countries_map,
+      fill_color = scale$expression,
+      fill_opacity = 0.75,
+      fill_outline_color = "#FFFFFF",
+      tooltip = "tooltip",
+      hover_options = list(fill_opacity = 1)
+    ) |>
+    add_legend(
+      paste("Visitors since", website_since()),
+      values = get_legend_labels(scale, digits = 0),
+      colors = get_legend_colors(scale),
+      type = "continuous",
+      position = "bottom-right"
+    )
+```

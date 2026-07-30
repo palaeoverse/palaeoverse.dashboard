@@ -172,14 +172,6 @@ vbox(
 )
 ```
 
-<!-- TODO: this would need to be in a separate tab since it's the same number -->
-<!-- ```{r}
-#| content: valuebox
-#| expandable: false
-# Organisation-wide, so this one is the same on every package tab
-vbox("Lecture series YouTube views", "youtube", latest_youtube_views())
-``` -->
-
 ###### Row
 
 ```{r}

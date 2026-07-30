@@ -9,6 +9,7 @@ Encoding: UTF-8
 Imports:
     bsicons,
     bslib,
+    countrycode,
     cranlogs,
     cyclocomp,
     dplyr,
@@ -21,10 +22,13 @@ Imports:
     jsonlite,
     knitr,
     loc,
+    mapgl,
+    maps,
     openalexR,
     reactable,
     rmarkdown,
     rvest,
+    sf,
     xml2
 Remotes:
     etiennebacher/cyclocomp@speedup,

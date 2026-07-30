@@ -19,11 +19,12 @@ jobs:
       # Authenticated GitHub API calls (higher rate limit) for gh::gh()
       GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Add Ubuntu dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgit2-dev libcurl4-openssl-dev
+        run: sudo apt-get update && sudo apt-get install -y libgit2-dev libcurl4-openssl-dev libgdal-dev libgeos-dev libproj-dev
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2

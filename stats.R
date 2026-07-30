@@ -268,6 +268,7 @@ ts_coverage <- function(
 # Every metric that has a history, in the order the download file lists them.
 time_series <- list(
   commits = ts_commits,
+  github_stars = ts_stars,
   contributors = ts_contributors,
   forks = ts_forks,
   open_issues = ts_open_issues,
@@ -278,9 +279,8 @@ time_series <- list(
   code_coverage = ts_coverage,
   mean_cyclomatic_complexity = ts_cyclocomp,
   cran_downloads = ts_downloads,
-  github_stars = ts_stars,
-  citations = ts_citations,
-  reverse_dependencies = ts_reverse_dependencies
+  reverse_dependencies = ts_reverse_dependencies,
+  citations = ts_citations
 )
 
 # Every series of one package, computed once per session: the overview page and
@@ -296,13 +296,6 @@ package_time_series <- function(pkg) {
 }
 
 
-####### Youtube lecture series
-
-# Views of the recorded talks of the Palaeoverse lecture series, collected by
-# fetch.R (see `update_youtube_views()` there) into "data/youtube.rds", one row
-# per day and per video. This belongs to the organisation rather than to one
-# package, so these two take no `pkg` and stay out of `time_series` above: every
-# package tab shows the same number.
 ts_youtube_views <- function() {
   if (!file.exists("data/youtube.rds")) {
     return(NULL)
@@ -312,12 +305,18 @@ ts_youtube_views <- function() {
     arrange(date)
 }
 
-latest_youtube_views <- function() {
-  views <- ts_youtube_views()
-  if (!NROW(views)) {
-    return(NA)
+ts_bsky <- function(metric = c("followers", "posts")) {
+  metric <- match.arg(metric)
+  if (!file.exists("data/bsky.rds")) {
+    return(NULL)
   }
-  views$value[which.max(views$date)]
+  stats <- readRDS("data/bsky.rds")
+  if (!NROW(stats)) {
+    return(NULL)
+  }
+  stats |>
+    select(date, value = all_of(metric)) |>
+    arrange(date)
 }
 
 
@@ -504,6 +503,115 @@ latest_cyclocomp_by_function <- function(pkg) {
 
   cc <- cyclocomp_from_source(pkg)
   cc[order(cc$complexity, decreasing = TRUE), ]
+}
+
+latest_youtube_views <- function() {
+  views <- ts_youtube_views()
+  if (!NROW(views)) {
+    return(NA)
+  }
+  views$value[which.max(views$date)]
+}
+
+# The same views, but split by talk: one row per recorded talk with its current
+# view count, most watched first.
+latest_youtube_views_by_video <- function() {
+  if (!file.exists("data/youtube.rds")) {
+    return(NULL)
+  }
+  views <- readRDS("data/youtube.rds")
+  if (!NROW(views)) {
+    return(NULL)
+  }
+  views |>
+    mutate(
+      title = sub("^Palaeoverse Lecture Series:\\s*", "", title),
+      published = published
+    ) |>
+    filter(date == max(date)) |>
+    select(title, video_id, published, views) |>
+    arrange(desc(views))
+}
+
+bsky_posts <- function() {
+  if (!file.exists("data/bsky_posts.rds")) {
+    return(NULL)
+  }
+  posts <- readRDS("data/bsky_posts.rds")
+  if (!NROW(posts)) {
+    return(NULL)
+  }
+  posts |>
+    mutate(
+      url = uri |>
+        sub(pattern = "^at://", replacement = "https://bsky.app/profile/") |>
+        sub(pattern = "/app\\.bsky\\.feed\\.post/", replacement = "/post/")
+    ) |>
+    arrange(date)
+}
+
+latest_bsky <- function(metric) {
+  stats <- ts_bsky(metric)
+  if (!NROW(stats)) {
+    return(NA)
+  }
+  stats$value[which.max(stats$date)]
+}
+
+
+####### Website stats
+
+.website_stats <- function() {
+  if (!file.exists("data/goatcounter.rds")) {
+    return(NULL)
+  }
+  readRDS("data/goatcounter.rds")
+}
+
+# Temp fix: goatcounter used to be on palaeoverse.org only so it reported pages like
+# "/our-packages", but it is now on all package websites at least and all reported
+# pages must include the domain.
+# This function ensures we drop the old "/our-packages" and friends.
+website_pages <- function() {
+  pages <- .website_stats()$pages
+  if (!NROW(pages)) {
+    return(NULL)
+  }
+  pages |>
+    filter(grepl("^/[^/]*palaeoverse\\.org(/|$)", path)) |>
+    mutate(
+      # "/events" and "/events/" are the same page, and the root is the bare host
+      url = sub("/$", "", sub("^/", "https://", path))
+    ) |>
+    arrange(desc(visitors))
+}
+
+website_countries_map <- function() {
+  countries <- .website_stats()$countries
+  if (!NROW(countries)) {
+    return(NULL)
+  }
+  world <- maps::map("world", fill = TRUE, plot = FALSE) |>
+    sf::st_as_sf()
+
+  world$code <- countrycode::countrycode(
+    world$ID,
+    origin = "country.name",
+    destination = "iso2c"
+  )
+
+  world |>
+    inner_join(countries, by = "code") |>
+    # sf::st_simplify(dTolerance = 10000, preserveTopology = TRUE) |>
+    mutate(
+      tooltip = paste0(
+        "<strong>",
+        country,
+        "</strong><br>",
+        visitors,
+        " visitors"
+      )
+    )
 }
 
 ####### Badges
