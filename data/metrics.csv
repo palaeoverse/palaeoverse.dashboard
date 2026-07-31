@@ -1727,8 +1727,9 @@
 "palaeoverse",2026-07-26,"cran_downloads",19402
 "palaeoverse",2026-07-27,"cran_downloads",19447
 "palaeoverse",2026-07-28,"cran_downloads",19454
-"palaeoverse",2026-07-29,"cran_downloads",19454
-"palaeoverse",2026-07-30,"cran_downloads",19454
+"palaeoverse",2026-07-29,"cran_downloads",19463
+"palaeoverse",2026-07-30,"cran_downloads",19463
+"palaeoverse",2026-07-31,"cran_downloads",19463
 "palaeoverse",2022-10-31,"cran_releases",1
 "palaeoverse",2023-01-12,"cran_releases",2
 "palaeoverse",2023-02-16,"cran_releases",3
@@ -3190,8 +3191,9 @@
 "rmacrostrat",2026-07-26,"cran_downloads",6987
 "rmacrostrat",2026-07-27,"cran_downloads",6991
 "rmacrostrat",2026-07-28,"cran_downloads",6998
-"rmacrostrat",2026-07-29,"cran_downloads",6998
-"rmacrostrat",2026-07-30,"cran_downloads",6998
+"rmacrostrat",2026-07-29,"cran_downloads",7004
+"rmacrostrat",2026-07-30,"cran_downloads",7004
+"rmacrostrat",2026-07-31,"cran_downloads",7004
 "rmacrostrat",2024-07-31,"cran_releases",1
 "rmacrostrat",2024-09-17,"cran_releases",2
 "rmacrostrat",2024-10-18,"cran_releases",3
@@ -3413,6 +3415,7 @@
 "rphylopic",2026-06-23,"citations",81
 "rphylopic",2026-06-24,"citations",82
 "rphylopic",2026-06-29,"citations",83
+"rphylopic",2026-07-29,"citations",84
 "rphylopic",2023-03-07,"code_coverage",96.64179
 "rphylopic",2023-03-08,"code_coverage",96.7033
 "rphylopic",2023-03-14,"code_coverage",96.7033
@@ -6423,8 +6426,9 @@
 "rphylopic",2026-07-26,"cran_downloads",51769
 "rphylopic",2026-07-27,"cran_downloads",51788
 "rphylopic",2026-07-28,"cran_downloads",51805
-"rphylopic",2026-07-29,"cran_downloads",51805
-"rphylopic",2026-07-30,"cran_downloads",51805
+"rphylopic",2026-07-29,"cran_downloads",51831
+"rphylopic",2026-07-30,"cran_downloads",51831
+"rphylopic",2026-07-31,"cran_downloads",51831
 "rphylopic",2018-11-19,"cran_releases",1
 "rphylopic",2020-06-04,"cran_releases",2
 "rphylopic",2023-03-20,"cran_releases",3
@@ -8342,8 +8346,9 @@
 "sepkoski",2026-07-26,"cran_downloads",8894
 "sepkoski",2026-07-27,"cran_downloads",8896
 "sepkoski",2026-07-28,"cran_downloads",8899
-"sepkoski",2026-07-29,"cran_downloads",8899
-"sepkoski",2026-07-30,"cran_downloads",8899
+"sepkoski",2026-07-29,"cran_downloads",8906
+"sepkoski",2026-07-30,"cran_downloads",8906
+"sepkoski",2026-07-31,"cran_downloads",8906
 "sepkoski",2022-11-23,"cran_releases",1
 "sepkoski",2025-02-24,"forks",1
 "sepkoski",2024-08-20,"github_stars",1
