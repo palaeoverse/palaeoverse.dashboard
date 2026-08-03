@@ -37,9 +37,19 @@ source("stats.R")
 fmt <- function(x) format(x, big.mark = ",")
 
 # One value box of a package tab. They all have the same shape: a title, an
-# icon, and the current value of one metric.
-vbox <- function(title, icon, value) {
-  list(title = title, icon = icon, color = "primary", value = fmt(value))
+# icon, and the current value of one metric, optionally linking somewhere.
+vbox <- function(title, icon, value, href = NULL) {
+  value <- fmt(value)
+  if (!is.null(href)) {
+    value <- paste0("[", value, "](", href, "){target=\"_blank\"}")
+  }
+  cat(
+    "::: {.valuebox title=\"", title, "\" icon=\"", icon, "\"",
+    " color=\"primary\" expandable=\"false\"}\n",
+    value,
+    "\n:::\n",
+    sep = ""
+  )
 }
 
 # One "icon + value + label" stat, shown in the overview card's stats grid.

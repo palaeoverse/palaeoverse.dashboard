@@ -23,33 +23,38 @@ last_release <- latest_release(pkg)
 ###### Row
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Number of contributors", "people", get_latest(pkg, "contributors"))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Number of forks", "diagram-2", get_latest(pkg, "forks", default_return = 0))
 ```
 
 
 ```{r}
-#| content: valuebox
-#| expandable: false
-vbox("Number of open issues", "exclamation-circle", get_latest(pkg, "open_issues", default_return = 0))
+#| output: asis
+vbox(
+  "Number of open issues",
+  "exclamation-circle",
+  get_latest(pkg, "open_issues", default_return = 0),
+  href = paste0("https://github.com/palaeoverse/", pkg, "/issues")
+)
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
-vbox("Number of open pull requests", "git", get_latest(pkg, "open_pull_requests", default_return = 0))
+#| output: asis
+vbox(
+  "Number of open pull requests",
+  "git",
+  get_latest(pkg, "open_pull_requests", default_return = 0),
+  href = paste0("https://github.com/palaeoverse/", pkg, "/pulls")
+)
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox(
   "Weeks since last CRAN update",
   "arrow-counterclockwise",
@@ -145,26 +150,22 @@ cyclocomp_by_function |>
 ###### Row
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("CRAN downloads", "cloud-download", get_latest(pkg, "cran_downloads"))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("GitHub stars", "star", get_latest(pkg, "github_stars", default_return = 0))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Citations", "book", get_latest(pkg, "citations", default_return = 0))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox(
   "Reverse dependencies",
   "arrow-down",

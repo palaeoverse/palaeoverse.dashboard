@@ -12,20 +12,17 @@ views_by_video <- latest_youtube_views_by_video()
 ##### Column {width="40%"}
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Views of the lecture series", "youtube", latest_youtube_views())
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Recorded talks", "camera-video", NROW(views_by_video))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox(
   "Average views per talk",
   "bar-chart",
@@ -113,14 +110,12 @@ bsky_excerpt <- function(text, n = 140) {
 ##### Row {width="40%"}
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 vbox("Followers", "people", latest_bsky("followers"))
 ```
 
 ```{r}
-#| content: valuebox
-#| expandable: false
+#| output: asis
 # The profile counter (`latest_bsky("posts")`) also counts replies and the
 # account's reposts of other people's posts, which the feed below leaves out;
 # counting the feed keeps this card and the chart on the same number.
