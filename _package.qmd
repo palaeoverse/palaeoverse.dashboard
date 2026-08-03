@@ -168,7 +168,7 @@ vbox("Citations", "book", get_latest(pkg, "citations", default_return = 0))
 #| output: asis
 vbox(
   "Reverse dependencies",
-  "arrow-down",
+  "boxes",
   get_latest(pkg, "reverse_dependencies", default_return = 0)
 )
 ```
