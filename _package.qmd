@@ -8,11 +8,42 @@ and produces the same layout and output types for all tabs.
 series <- package_time_series(pkg)
 
 # Those don't have an associated time series.
+open_issues <- latest_open_issues(pkg)
+open_prs <- latest_open_prs(pkg)
 cov_by_file <- latest_coverage_by_file(pkg)
 cyclocomp_by_function <- latest_cyclocomp_by_function(pkg)
 last_release <- latest_release(pkg)
 ```
 
+```{r}
+# The open issues and the open pull requests of a package are listed the same
+# way: the title links to GitHub, the rest says who opened it and when.
+issue_pr_table <- function(items) {
+  items |>
+    mutate(
+      title = paste0(
+        "<a href=\"",
+        url,
+        "\" target=\"_blank\">",
+        htmltools::htmlEscape(title),
+        "</a>"
+      )
+    ) |>
+    select(number, title, author, opened) |>
+    reactable(
+      columns = list(
+        number = colDef(name = "#", maxWidth = 70),
+        title = colDef(name = "Title", html = TRUE),
+        author = colDef(name = "Opened by", maxWidth = 140),
+        opened = colDef(name = "Opened", maxWidth = 110)
+      ),
+      defaultSorted = list(opened = "desc"),
+      searchable = TRUE,
+      highlight = TRUE
+    )
+}
+
+```
 
 ### Column {.tabset}
 
@@ -92,6 +123,18 @@ series$lines_of_code |>
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |>
   e_title("Number of lines of code")
+```
+
+###### Row
+
+```{r}
+#| title: Open issues
+issue_pr_table(open_issues)
+```
+
+```{r}
+#| title: Open pull requests
+issue_pr_table(open_prs)
 ```
 
 

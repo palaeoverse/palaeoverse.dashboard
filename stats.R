@@ -348,15 +348,47 @@ latest_release <- function(pkg) {
   )
 }
 
-# Pull requests carry their creation date but not the day they were closed, so
-# how many are open is a "now" number, not the last point of a series.
-latest_open_prs <- function(pkg) {
-  gh(
-    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
+latest_open_issues <- function(pkg) {
+  issues <- gh(
+    "GET /repos/palaeoverse/{pkg}/issues?state=open",
     pkg = pkg,
     .limit = Inf
   ) |>
-    length()
+    Filter(f = function(x) is.null(x$pull_request))
+
+  tibble(
+    number = vapply(issues, function(x) as.integer(x$number), integer(1)),
+    title = vapply(issues, function(x) x$title, character(1)),
+    author = vapply(issues, function(x) x$user$login, character(1)),
+    opened = as.Date(.as_time(vapply(
+      issues,
+      function(x) x$created_at,
+      character(1)
+    ))),
+    url = vapply(issues, function(x) x$html_url, character(1))
+  ) |>
+    arrange(desc(opened))
+}
+
+latest_open_prs <- function(pkg) {
+  prs <- gh(
+    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
+    pkg = pkg,
+    .limit = Inf
+  )
+
+  tibble(
+    number = vapply(prs, function(x) as.integer(x$number), integer(1)),
+    title = vapply(prs, function(x) x$title, character(1)),
+    author = vapply(prs, function(x) x$user$login, character(1)),
+    opened = as.Date(.as_time(vapply(
+      prs,
+      function(x) x$created_at,
+      character(1)
+    ))),
+    url = vapply(prs, function(x) x$html_url, character(1))
+  ) |>
+    arrange(desc(opened))
 }
 
 # GitHub tags every issue and every comment with an `author_association`:
@@ -420,7 +452,11 @@ issue_response_times <- function(pkg) {
     pkg = pkg,
     number = vapply(issues, function(x) as.integer(x$number), integer(1)),
     author = vapply(issues, function(x) x$user$login, character(1)),
-    opened_at = .as_time(vapply(issues, function(x) x$created_at, character(1))),
+    opened_at = .as_time(vapply(
+      issues,
+      function(x) x$created_at,
+      character(1)
+    )),
     closed_at = .as_time(vapply(
       issues,
       function(x) x$closed_at %||% NA_character_,
