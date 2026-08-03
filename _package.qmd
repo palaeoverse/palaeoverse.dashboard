@@ -56,6 +56,15 @@ vbox(
 ```{r}
 #| output: asis
 vbox(
+  "Average time to first response in issues (hours)",
+  "stopwatch",
+  round(latest_mean_response_time(pkg), 1)
+)
+```
+
+```{r}
+#| output: asis
+vbox(
   "Weeks since last CRAN update",
   "arrow-counterclockwise",
   last_release[["n_weeks"]]

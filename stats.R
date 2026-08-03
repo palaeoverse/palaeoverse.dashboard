@@ -50,6 +50,11 @@ library(openalexR)
   )
 }
 
+# GitHub reports its timestamps as "2024-03-12T09:41:57Z".
+.as_time <- function(x) {
+  as.POSIXct(x, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+}
+
 # Takes a path to an RDS file that contains pre-computed data (e.g. list of commits)
 # and returns a dataframe with the date and the required column (column name depends
 # on the data we're looking at), renamed to `value` like every other series.
@@ -352,6 +357,99 @@ latest_open_prs <- function(pkg) {
     .limit = Inf
   ) |>
     length()
+}
+
+# GitHub tags every issue and every comment with an `author_association`:
+# someone who belongs to the organisation is OWNER, MEMBER or COLLABORATOR,
+# anybody else is CONTRIBUTOR or NONE. This is what tells apart the issues
+# opened by users from the ones opened by the team, and what identifies the
+# first answer coming from the team.
+.member_associations <- c("OWNER", "MEMBER", "COLLABORATOR")
+
+# When did a member first comment on each issue? Comments are fetched for the
+# whole repository at once rather than one call per issue. They don't carry the
+# issue number but their `issue_url` ends with it.
+.first_member_reply <- function(pkg) {
+  comments <- gh(
+    "GET /repos/palaeoverse/{pkg}/issues/comments",
+    pkg = pkg,
+    .limit = Inf
+  ) |>
+    Filter(f = function(x) x$author_association %in% .member_associations)
+
+  tibble(
+    number = vapply(
+      comments,
+      function(x) as.integer(basename(x$issue_url)),
+      integer(1)
+    ),
+    first_reply_at = .as_time(vapply(
+      comments,
+      function(x) x$created_at,
+      character(1)
+    ))
+  ) |>
+    slice_min(first_reply_at, by = number, with_ties = FALSE)
+}
+
+# One row per issue opened by someone outside the team, with the time it took to
+# get a first answer from a member (NA when there is none yet) and the day the
+# issue was closed (NA when it is still open). Cached like the time series: the
+# value card and the chart ask for the same numbers, and this costs two
+# paginated calls.
+.response_times_cache <- new.env(parent = emptyenv())
+
+issue_response_times <- function(pkg) {
+  if (!is.null(.response_times_cache[[pkg]])) {
+    return(.response_times_cache[[pkg]])
+  }
+
+  # The issues endpoint returns pull requests too, so entries carrying a
+  # `pull_request` field are dropped to keep genuine issues only.
+  issues <- gh(
+    "GET /repos/palaeoverse/{pkg}/issues?state=all",
+    pkg = pkg,
+    .limit = Inf
+  ) |>
+    Filter(f = function(x) {
+      is.null(x$pull_request) &&
+        !x$author_association %in% .member_associations
+    })
+
+  out <- tibble(
+    pkg = pkg,
+    number = vapply(issues, function(x) as.integer(x$number), integer(1)),
+    author = vapply(issues, function(x) x$user$login, character(1)),
+    opened_at = .as_time(vapply(issues, function(x) x$created_at, character(1))),
+    closed_at = .as_time(vapply(
+      issues,
+      function(x) x$closed_at %||% NA_character_,
+      character(1)
+    ))
+  ) |>
+    left_join(.first_member_reply(pkg), by = "number") |>
+    mutate(
+      response_hours = as.numeric(difftime(
+        first_reply_at,
+        opened_at,
+        units = "hours"
+      ))
+    ) |>
+    relocate(closed_at, .after = response_hours) |>
+    arrange(desc(opened_at))
+
+  .response_times_cache[[pkg]] <- out
+  out
+}
+
+# Issues still waiting for an answer have no response time, so they are left out
+# of the average rather than counted as infinitely slow.
+latest_mean_response_time <- function(pkg) {
+  hours <- issue_response_times(pkg)$response_hours
+  if (!any(!is.na(hours))) {
+    return(NA)
+  }
+  mean(hours, na.rm = TRUE)
 }
 
 latest_cran_checks <- function(pkg) {
