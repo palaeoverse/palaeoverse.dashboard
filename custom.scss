@@ -22,7 +22,7 @@ body,
 // spacing off. Centre the three rows (CRAN line, badges, stats grid), give them
 // one uniform gap and stop them growing. The card may be taller than its
 // content — the rows sit at the top rather than filling the height.
-#overview .card-body {
+.overview-row .card-body {
   align-items: center;
   justify-content: flex-start;
   gap: .75rem !important;
@@ -33,11 +33,22 @@ body,
 }
 
 .overview-row {
-  --overview-card-width: 24rem;
-  grid-template-columns:
-    var(--overview-card-width) var(--overview-card-width) !important;
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
   justify-content: center;
-  column-gap: 2rem;
+  gap: 2rem;
+  max-width: 50rem;
+  margin-inline: auto;
+
+  >.card {
+    flex: 1 1 18rem;
+  }
+}
+
+.dashboard-page:has(.overview-row) {
+  overflow-y: auto;
 }
 
 // CRAN check status on its own centred line at the top. Force plain block flow

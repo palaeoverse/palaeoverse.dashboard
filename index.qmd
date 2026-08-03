@@ -1,5 +1,5 @@
 ---
-title: "Palaeoverse packages dashboard"
+title: "Palaeoverse dashboard"
 logo: _brand/logos/logo.png
 format:
   dashboard:
@@ -84,7 +84,7 @@ overview_stat <- function(icon, value, label, pkg = NULL) {
 # Codecov badge (all built in stats.R) and a small grid of repository stats.
 # The card itself and its header (the package name) are provided by the
 # dashboard cell + its `title` option.
-overview_card <- function(pkg) {
+pkg_overview_card <- function(pkg) {
   last_release <- latest_release(pkg)
   htmltools::HTML(paste0(
     "<div class=\"overview-cran\"><strong>CRAN checks:</strong> ",
@@ -124,34 +124,62 @@ overview_card <- function(pkg) {
     "</div>"
   ))
 }
+
+other_overview_card <- function(repo, workflow1, workflow2) {
+  htmltools::HTML(paste0(
+    "<div class=\"overview-badges\">",
+    "<span>",
+    .badge(repo, workflow1),
+    "</span>",
+    "<span>",
+    .badge(repo, workflow2),
+    "</span>",
+    "<span>",
+    "</div>"
+  ))
+}
 ```
 
 
-# Package overview
+# Repositories overview
 
 
 ### Row {.overview-row}
 
 ```{r}
 #| title: palaeoverse
-overview_card("palaeoverse")
+#| expandable: false
+pkg_overview_card("palaeoverse")
 ```
 
 ```{r}
 #| title: rmacrostrat
-overview_card("rmacrostrat")
+#| expandable: false
+pkg_overview_card("rmacrostrat")
 ```
-
-### Row {.overview-row}
 
 ```{r}
 #| title: rphylopic
-overview_card("rphylopic")
+#| expandable: false
+pkg_overview_card("rphylopic")
 ```
 
 ```{r}
 #| title: sepkoski
-overview_card("sepkoski")
+#| expandable: false
+pkg_overview_card("sepkoski")
+```
+
+```{r}
+#| title: palaeoverse.dashboard
+#| expandable: false
+other_overview_card("palaeoverse.dashboard", "render-dashboard.yaml", "refresh-data.yaml")
+```
+
+```{r}
+#| title: palaeoverse.github.io
+#| expandable: false
+other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-links.yml")
 ```
 
 # palaeoverse
