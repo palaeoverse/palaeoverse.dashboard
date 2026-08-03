@@ -313,7 +313,6 @@ update_git_history_stats <- function(existing = NULL, pkg) {
     )
   })
   data.frame(
-    date = Sys.Date(),
     video_id = ids,
     title = vapply(details, `[[`, character(1), "title"),
     # `vapply()` drops the Date class, hence putting it back explicitly
@@ -322,25 +321,12 @@ update_git_history_stats <- function(existing = NULL, pkg) {
       origin = "1970-01-01"
     ),
     views = vapply(details, `[[`, numeric(1), "views"),
+    checked = Sys.Date(),
     row.names = NULL
   )
 }
 
-# The most recent value one column was seen with, for each video.
-.last_known <- function(existing, column) {
-  known <- existing[!is.na(existing[[column]]), c("date", "video_id", column)]
-  known <- known[order(known$date), ]
-  known[!duplicated(known$video_id, fromLast = TRUE), ]
-}
-
-# Youtube only reports how many views a video has *now*, so the history is built
-# one measurement at a time. The refresh runs every 12 hours but a measurement a
-# day is enough, so a day that was already collected is left alone.
 update_youtube_views <- function(existing = NULL) {
-  if (Sys.Date() %in% existing$date) {
-    return(existing)
-  }
-
   today <- .youtube_views_today()
   today <- today[!is.na(today$views), , drop = FALSE]
   if (!nrow(today)) {
@@ -352,17 +338,19 @@ update_youtube_views <- function(existing = NULL) {
   }
 
   if (NROW(existing)) {
+    previous <- existing[
+      match(today$video_id, existing$video_id),
+      ,
+      drop = FALSE
+    ]
     for (column in c("title", "published")) {
-      known <- .last_known(existing, column)
-      today[[column]] <- coalesce(
-        today[[column]],
-        known[[column]][match(today$video_id, known$video_id)]
-      )
+      today[[column]] <- coalesce(today[[column]], previous[[column]])
     }
+    existing <- existing[!existing$video_id %in% today$video_id, , drop = FALSE]
   }
 
   bind_rows(existing, today) |>
-    arrange(date, video_id)
+    arrange(published)
 }
 
 ####### Bluesky account of the organisation

@@ -296,15 +296,6 @@ package_time_series <- function(pkg) {
 }
 
 
-ts_youtube_views <- function() {
-  if (!file.exists("data/youtube.rds")) {
-    return(NULL)
-  }
-  readRDS("data/youtube.rds") |>
-    summarize(value = sum(views, na.rm = TRUE), .by = date) |>
-    arrange(date)
-}
-
 ts_bsky <- function(metric = c("followers", "posts")) {
   metric <- match.arg(metric)
   if (!file.exists("data/bsky.rds")) {
@@ -505,12 +496,15 @@ latest_cyclocomp_by_function <- function(pkg) {
   cc[order(cc$complexity, decreasing = TRUE), ]
 }
 
+# How many views the lecture series has gathered in total. "data/youtube.rds"
+# holds the current count of each talk (see `update_youtube_views()`), so this
+# is a sum over the talks rather than the last point of a series.
 latest_youtube_views <- function() {
-  views <- ts_youtube_views()
+  views <- latest_youtube_views_by_video()
   if (!NROW(views)) {
     return(NA)
   }
-  views$value[which.max(views$date)]
+  sum(views$views)
 }
 
 # The same views, but split by talk: one row per recorded talk with its current
@@ -525,7 +519,6 @@ latest_youtube_views_by_video <- function() {
   }
   out <- views |>
     mutate(title = sub("^Palaeoverse Lecture Series:\\s*", "", title)) |>
-    filter(date == max(date)) |>
     select(title, video_id, published, views) |>
     arrange(desc(views))
 
