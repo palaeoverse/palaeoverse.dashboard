@@ -43,7 +43,21 @@ vbox <- function(title, icon, value) {
 }
 
 # One "icon + value + label" stat, shown in the overview card's stats grid.
-overview_stat <- function(icon, value, label) {
+overview_stat <- function(icon, value, label, pkg = NULL) {
+  label <- switch(
+    label,
+    "open issues" = paste0(
+      "<a href='https://github.com/palaeoverse/", pkg, "/issues' target='_blank'>",
+      label, 
+      "</a>"
+    ),
+    "open PRs" = paste0(
+      "<a href='https://github.com/palaeoverse/", pkg, "/pulls' target='_blank'>",
+      label, 
+      "</a>"
+    ),
+    label
+  ) 
   paste0(
     "<div class=\"overview-stat\">",
     as.character(bsicons::bs_icon(icon)),
@@ -92,9 +106,10 @@ overview_card <- function(pkg) {
     overview_stat(
       "exclamation-circle",
       get_latest(pkg, "open_issues"),
-      "open issues"
+      "open issues", 
+      pkg = pkg
     ),
-    overview_stat("git", latest_open_prs(pkg), "open PRs"),
+    overview_stat("git", latest_open_prs(pkg), "open PRs", pkg = pkg),
     "</div>",
     "</div>"
   ))
