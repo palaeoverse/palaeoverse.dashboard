@@ -243,10 +243,21 @@ update_git_history_stats <- function(existing = NULL, pkg) {
 # which is publicly available from the video page. Youtube API is complicated to
 # set up and use so we just scrape the page of all videos.
 .youtube_video_details <- function(video_id) {
-  page <- rvest::read_html(paste0(
-    "https://www.youtube.com/watch?v=",
-    video_id
-  ))
+  page <- httr2::request("https://www.youtube.com/watch") |>
+    httr2::req_url_query(v = video_id, hl = "en") |>
+    httr2::req_headers(
+      `User-Agent` = paste(
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+      ),
+      `Accept-Language` = "en-US,en;q=0.9",
+      # The cookies the consent screen sets once it has been dismissed
+      Cookie = "CONSENT=YES+cb; SOCS=CAI"
+    ) |>
+    httr2::req_retry(max_tries = 3) |>
+    httr2::req_perform() |>
+    httr2::resp_body_string() |>
+    rvest::read_html()
 
   scripts <- page |>
     rvest::html_elements("script") |>
@@ -254,6 +265,14 @@ update_git_history_stats <- function(existing = NULL, pkg) {
 
   js <- scripts[grepl("ytInitialPlayerResponse", scripts, fixed = TRUE)][1]
   m <- regmatches(js, regexpr('"viewCount"\\s*:\\s*"[0-9]+"', js))
+  if (!length(m)) {
+    stop(
+      "no view count in the page served for ",
+      video_id,
+      " (Youtube answered with something else than the video page)",
+      call. = FALSE
+    )
+  }
 
   meta <- function(selector) {
     content <- page |>
@@ -270,7 +289,7 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   list(
     title = meta("meta[name='title'], meta[property='og:title']"),
     published = published,
-    views = if (length(m)) as.numeric(gsub("\\D", "", m)) else NA_real_
+    views = as.numeric(gsub("\\D", "", m))
   )
 }
 
@@ -284,6 +303,7 @@ update_git_history_stats <- function(existing = NULL, pkg) {
     tryCatch(
       .youtube_video_details(id),
       error = function(e) {
+        message("   could not be read: ", conditionMessage(e))
         list(
           title = NA_character_,
           published = as.Date(NA),
@@ -306,6 +326,13 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   )
 }
 
+# The most recent value one column was seen with, for each video.
+.last_known <- function(existing, column) {
+  known <- existing[!is.na(existing[[column]]), c("date", "video_id", column)]
+  known <- known[order(known$date), ]
+  known[!duplicated(known$video_id, fromLast = TRUE), ]
+}
+
 # Youtube only reports how many views a video has *now*, so the history is built
 # one measurement at a time. The refresh runs every 12 hours but a measurement a
 # day is enough, so a day that was already collected is left alone.
@@ -313,7 +340,28 @@ update_youtube_views <- function(existing = NULL) {
   if (Sys.Date() %in% existing$date) {
     return(existing)
   }
-  bind_rows(existing, .youtube_views_today()) |>
+
+  today <- .youtube_views_today()
+  today <- today[!is.na(today$views), , drop = FALSE]
+  if (!nrow(today)) {
+    warning(
+      "no youtube view count could be read, leaving the collected data as it is",
+      call. = FALSE
+    )
+    return(existing)
+  }
+
+  if (NROW(existing)) {
+    for (column in c("title", "published")) {
+      known <- .last_known(existing, column)
+      today[[column]] <- coalesce(
+        today[[column]],
+        known[[column]][match(today$video_id, known$video_id)]
+      )
+    }
+  }
+
+  bind_rows(existing, today) |>
     arrange(date, video_id)
 }
 

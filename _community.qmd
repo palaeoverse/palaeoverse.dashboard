@@ -71,9 +71,10 @@ views_by_video |>
       "</a>"
     )
   ) |>
-  select(title, views) |>
+  select(published, title, views) |>
   reactable(
     columns = list(
+      published = colDef(name = "Published"),
       title = colDef(name = "Talk", html = TRUE),
       views = colDef(name = "Views")
     ),

@@ -523,14 +523,14 @@ latest_youtube_views_by_video <- function() {
   if (!NROW(views)) {
     return(NULL)
   }
-  views |>
-    mutate(
-      title = sub("^Palaeoverse Lecture Series:\\s*", "", title),
-      published = published
-    ) |>
+  out <- views |>
+    mutate(title = sub("^Palaeoverse Lecture Series:\\s*", "", title)) |>
     filter(date == max(date)) |>
     select(title, video_id, published, views) |>
     arrange(desc(views))
+
+  rownames(out) <- NULL
+  out
 }
 
 bsky_posts <- function() {
