@@ -149,7 +149,7 @@ other_overview_card <- function(repo, workflow1, workflow2) {
 
 # Repositories overview
 
-## Row
+## Row {.overview-layout}
 
 ### Column {.overview-row width="50%"}
 
@@ -189,7 +189,7 @@ other_overview_card("palaeoverse.dashboard", "render-dashboard.yaml", "refresh-d
 other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-links.yml")
 ```
 
-### Column {width="50%"}
+### Column {.overview-charts width="50%"}
 
 ```{r}
 #| title: Cumulative number of CRAN downloads
@@ -206,8 +206,8 @@ Reduce(function(x, y) full_join(x, y, by = "date"), series) |>
   e_line(sepkoski, symbol = "none") |> 
   e_line(rmacrostrat, symbol = "none") |> 
   e_line(rphylopic, symbol = "none") |> 
-  e_legend(right = 0, top = "center", orient = "vertical", itemGap = 30) |>
-  e_grid(left = "5%", right = "15%", top = "5%") |> 
+  e_legend(top = 0) |>
+  e_grid(left = "5%", top = "10%", right = "5%") |> 
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |> 
   e_toolbox(show = FALSE) 
@@ -229,8 +229,8 @@ Reduce(function(x, y) full_join(x, y, by = "date"), series) |>
   e_line(sepkoski, symbol = "none") |> 
   e_line(rmacrostrat, symbol = "none") |> 
   e_line(rphylopic, symbol = "none") |> 
-  e_legend(right = 0, top = "center", orient = "vertical", itemGap = 30) |>
-  e_grid(left = "5%", right = "15%", top = "5%") |> 
+  e_legend(top = 0) |>
+  e_grid(left = "5%", top = "10%", right = "5%") |> 
   e_tooltip(trigger = "axis") |>
   e_datazoom(type = "slider") |> 
   e_toolbox(show = FALSE)

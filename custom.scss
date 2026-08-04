@@ -19,14 +19,29 @@ body,
 
 // The cards take the left half of the overview page, two per row. The two
 // repository cards on the last row hold nothing but a pair of badges, so that
-// row is content-sized and the four package cards share every pixel left: the
-// column fills the viewport exactly, with nothing to scroll. `minmax(0, …)`
-// lets the package rows shrink past their content on a short window, where the
-// card bodies scroll rather than the cards overflowing.
 .overview-row {
   grid-template-columns: 1fr 1fr !important;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto !important;
+  grid-template-rows: repeat(2, minmax(min-content, 1fr)) min-content !important;
   gap: 1rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 991.98px) {
+  .dashboard-page:has(.overview-layout) {
+    overflow-y: auto;
+
+    .bslib-grid {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: none !important;
+      grid-auto-rows: auto !important;
+      flex: 0 0 auto !important;
+      overflow: visible !important;
+    }
+  }
+
+  .overview-charts>.card {
+    min-height: 20rem;
+  }
 }
 
 // Each overview card body is a bslib `.html-fill-container`: a flex column
@@ -38,6 +53,7 @@ body,
 .overview-row .cell-output-display {
   justify-content: space-evenly;
   align-items: center;
+  min-height: min-content;
 
   >* {
     flex: 0 0 auto !important;
