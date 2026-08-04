@@ -446,6 +446,11 @@ update_bsky_posts <- function() {
           function(x) as.numeric(x$repostCount %||% 0),
           numeric(1)
         ),
+        replies = vapply(
+          posts,
+          function(x) as.numeric(x$replyCount %||% 0),
+          numeric(1)
+        ),
         row.names = NULL
       )
     },

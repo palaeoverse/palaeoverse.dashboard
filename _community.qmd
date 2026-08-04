@@ -3,6 +3,38 @@
 # Unlike every tab above, this one is about the organisation as a whole rather
 # than about one package: one tab per channel the community is reached through.
 views_by_video <- latest_youtube_views_by_video()
+
+# The feed carries every post ever made, with the date it was written and the
+# likes and reposts it has gathered since (those are the numbers each post has
+# now, not what it had then).
+bsky_all_posts <- bsky_posts()
+
+no_feed <- paste(
+  "No posts collected yet: the Bluesky feed could not be read the last time",
+  "the data was refreshed."
+)
+
+# Posts run long and hold newlines, so both the table and the chart show the
+# opening of a post rather than the whole of it.
+bsky_excerpt <- function(text, n = 140) {
+  flat <- trimws(gsub("\\s+", " ", text))
+  paste0(
+    htmltools::htmlEscape(substr(flat, 1, n)),
+    ifelse(nchar(flat) > n, "…", "")
+  )
+}
+
+# What a post gathers on average. Like the counters above, these are the numbers
+# the posts hold now rather than what they held when they were written.
+# `replies` is read from the feed only as of this version of fetch.R, so it is
+# missing from posts collected before the next refresh.
+bsky_average <- function(metric) {
+  values <- bsky_all_posts[[metric]]
+  if (is.null(values)) {
+    return(NA)
+  }
+  round(mean(values), 1)
+}
 ```
 
 ### Column {.tabset}
@@ -89,29 +121,7 @@ views_by_video |>
 
 #### Bluesky
 
-```{r}
-# The feed carries every post ever made, with the date it was written and the
-# likes and reposts it has gathered since (those are the numbers each post has
-# now, not what it had then).
-bsky_all_posts <- bsky_posts()
-
-no_feed <- paste(
-  "No posts collected yet: the Bluesky feed could not be read the last time",
-  "the data was refreshed."
-)
-
-# Posts run long and hold newlines, so both the table and the chart show the
-# opening of a post rather than the whole of it.
-bsky_excerpt <- function(text, n = 140) {
-  flat <- trimws(gsub("\\s+", " ", text))
-  paste0(
-    htmltools::htmlEscape(substr(flat, 1, n)),
-    ifelse(nchar(flat) > n, "…", "")
-  )
-}
-```
-
-##### Row {width="40%"}
+###### Row
 
 ```{r}
 #| output: asis
@@ -126,7 +136,22 @@ vbox("Followers", "people", latest_bsky("followers"))
 vbox("Posts", "chat-text", NROW(bsky_all_posts))
 ```
 
-##### Row {width="60%"}
+```{r}
+#| output: asis
+vbox("Average likes per post", "heart", bsky_average("likes"))
+```
+
+```{r}
+#| output: asis
+vbox("Average reposts per post", "repeat", bsky_average("reposts"))
+```
+
+```{r}
+#| output: asis
+vbox("Average comments per post", "chat-dots", bsky_average("replies"))
+```
+
+###### Row
 
 ```{r}
 #| title: Most popular posts
@@ -195,7 +220,7 @@ missing_token <- paste(
 )
 ```
 
-##### Column {width="50%"}
+####### Row
 
 ```{r}
 #| title: Most visited pages
@@ -229,8 +254,6 @@ table <- site_pages |>
   )
 
 ```
-
-##### Column {width="50%"}
 
 ```{r}
 #| title: Visitors by country
