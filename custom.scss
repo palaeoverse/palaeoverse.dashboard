@@ -17,38 +17,31 @@ body,
   background-color: $bg-light !important;
 }
 
+// The cards take the left half of the overview page, two per row. The two
+// repository cards on the last row hold nothing but a pair of badges, so that
+// row is content-sized and the four package cards share every pixel left: the
+// column fills the viewport exactly, with nothing to scroll. `minmax(0, …)`
+// lets the package rows shrink past their content on a short window, where the
+// card bodies scroll rather than the cards overflowing.
+.overview-row {
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto !important;
+  gap: 1rem;
+}
+
 // Each overview card body is a bslib `.html-fill-container`: a flex column
-// whose children otherwise stretch to fill the card height, which throws the
-// spacing off. Centre the three rows (CRAN line, badges, stats grid), give them
-// one uniform gap and stop them growing. The card may be taller than its
-// content — the rows sit at the top rather than filling the height.
-.overview-row .card-body {
+// whose children stretch to fill the card height, which throws the spacing
+// off. The single `.cell-output-display` wrapper does fill it, but the rows
+// inside (CRAN line, badges, stats grid) keep their natural height and spread
+// down the card, so a card taller than its content grows the space between its
+// rows rather than the rows themselves.
+.overview-row .cell-output-display {
+  justify-content: space-evenly;
   align-items: center;
-  justify-content: flex-start;
-  gap: .75rem !important;
 
   >* {
     flex: 0 0 auto !important;
   }
-}
-
-.overview-row {
-  display: flex !important;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  justify-content: center;
-  gap: 2rem;
-  max-width: 50rem;
-  margin-inline: auto;
-
-  >.card {
-    flex: 1 1 18rem;
-  }
-}
-
-.dashboard-page:has(.overview-row) {
-  overflow-y: auto;
 }
 
 // CRAN check status on its own centred line at the top. Force plain block flow
@@ -59,21 +52,17 @@ body,
   text-align: center;
 }
 
-// The three card rows (CRAN line, badges, stats) are direct children of a
+// The card rows (CRAN line, badges, stats) are direct children of a
 // `.cell-output-display` wrapper with no gap, so they'd otherwise touch. Space
-// out the badges and stats rows from the row above with an explicit margin
-// (bslib's fill container can swallow a container `gap`, so use margins).
-.last-cran-update,
-.overview-badges {
-  margin-top: 2rem !important;
+// them out with an explicit margin (bslib's fill container can swallow a
+// container `gap`), and only between siblings, so a card that holds nothing
+// but badges doesn't open on an empty band.
+.overview-row .cell-output-display>*+* {
+  margin-top: .75rem !important;
 }
 
 .last-cran-update {
   text-align: center;
-}
-
-.overview-stats {
-  margin-top: 2rem !important;
 }
 
 // The badges sit on a centred line. `flex-direction` and the child `!important`
@@ -125,7 +114,7 @@ body,
 }
 
 .overview-stats-row+.overview-stats-row {
-  margin-top: 1rem !important;
+  margin-top: .5rem !important;
 }
 
 .overview-stat {

@@ -110,7 +110,8 @@ series$commits |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Cumulative number of commits")
 ```
 
@@ -121,7 +122,8 @@ series$lines_of_code |>
   e_line(serie = value, name = "Number of lines of code") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Number of lines of code")
 ```
 
@@ -148,7 +150,8 @@ series$code_coverage |>
   e_line(serie = value, name = "Code coverage") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Code coverage", subtext = "Higher is better")
 ```
 
@@ -158,7 +161,8 @@ series$mean_cyclomatic_complexity |>
   e_line(serie = value, name = "Average cyclomatic complexity") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Average cyclomatic complexity", subtext = "Lower is better")
 ```
 
@@ -235,7 +239,8 @@ series$cran_downloads |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Cumulative number of CRAN downloads")
 ```
 
@@ -246,6 +251,7 @@ series$github_stars |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Cumulative number of Github stars")
 ```

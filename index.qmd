@@ -31,8 +31,11 @@ library(cranlogs)
 library(reactable)
 library(echarts4r)
 library(mapgl)
+library(tidyr)
 
 source("stats.R")
+
+pkgs <- c("palaeoverse", "rmacrostrat", "rphylopic", "sepkoski")
 
 fmt <- function(x) format(x, big.mark = ",")
 
@@ -135,10 +138,9 @@ other_overview_card <- function(repo, workflow1, workflow2) {
     "<div class=\"overview-badges\">",
     "<span>",
     .badge(repo, workflow1),
-    "</span><br><span>",
+    "</span><span>",
     .badge(repo, workflow2),
     "</span>",
-    "<span>",
     "</div>"
   ))
 }
@@ -147,8 +149,9 @@ other_overview_card <- function(repo, workflow1, workflow2) {
 
 # Repositories overview
 
+## Row
 
-### Row {.overview-row}
+### Column {.overview-row width="50%"}
 
 ```{r}
 #| title: palaeoverse
@@ -184,6 +187,53 @@ other_overview_card("palaeoverse.dashboard", "render-dashboard.yaml", "refresh-d
 #| title: palaeoverse.github.io
 #| expandable: false
 other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-links.yml")
+```
+
+### Column {width="50%"}
+
+```{r}
+#| title: Cumulative number of CRAN downloads
+series <- lapply(pkgs, function(pkg) {
+  out <- package_time_series(pkg)[["cran_downloads"]][c("date", "value")]
+  names(out)[2] <- pkg
+  out
+})
+
+Reduce(function(x, y) full_join(x, y, by = "date"), series) |>
+  arrange(date) |> 
+  e_charts(x = date) |> 
+  e_line(palaeoverse, symbol = "none") |> 
+  e_line(sepkoski, symbol = "none") |> 
+  e_line(rmacrostrat, symbol = "none") |> 
+  e_line(rphylopic, symbol = "none") |> 
+  e_legend(right = 0, top = "center", orient = "vertical", itemGap = 30) |>
+  e_grid(left = "5%", right = "15%", top = "5%") |> 
+  e_tooltip(trigger = "axis") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) 
+```
+
+```{r}
+#| title: Cumulative number of GitHub stars
+series <- lapply(pkgs, function(pkg) {
+  out <- package_time_series(pkg)[["github_stars"]][c("date", "value")]
+  names(out)[2] <- pkg
+  out
+})
+
+Reduce(function(x, y) full_join(x, y, by = "date"), series) |>
+  arrange(date) |> 
+  fill(palaeoverse, sepkoski, rmacrostrat, rphylopic, .direction = "down") |> 
+  e_charts(x = date) |> 
+  e_line(palaeoverse, symbol = "none") |> 
+  e_line(sepkoski, symbol = "none") |> 
+  e_line(rmacrostrat, symbol = "none") |> 
+  e_line(rphylopic, symbol = "none") |> 
+  e_legend(right = 0, top = "center", orient = "vertical", itemGap = 30) |>
+  e_grid(left = "5%", right = "15%", top = "5%") |> 
+  e_tooltip(trigger = "axis") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE)
 ```
 
 # palaeoverse {scrolling="true"}

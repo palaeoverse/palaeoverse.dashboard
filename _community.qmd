@@ -55,7 +55,8 @@ views_by_video |>
     ),
     extraCssText = "max-width: 25rem; white-space: normal;"
   ) |>
-  e_datazoom(type = "slider") |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
   e_title("Views per talk", subtext = "By date of publication")
 ```
 
@@ -160,7 +161,8 @@ bsky_all_posts |>
     e_line(serie = posts, name = "Posts") |>
     e_legend(show = FALSE) |>
     e_tooltip(trigger = "axis") |>
-    e_datazoom(type = "slider") |>
+    e_datazoom(type = "slider") |> 
+    e_toolbox(show = FALSE) |>
     e_title(
       "Posts over time",
       subtext = "Cumulative, excluding replies and reposts"

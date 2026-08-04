@@ -29,6 +29,7 @@ Imports:
     rmarkdown,
     rvest,
     sf,
+    tidyr,
     xml2
 Remotes:
     etiennebacher/cyclocomp@speedup,
