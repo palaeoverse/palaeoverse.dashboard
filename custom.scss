@@ -180,3 +180,7 @@ body,
 .card-header {
   background: $bg-dark;
 }
+
+#quarto-content {
+  padding-top: 0 !important;
+}
