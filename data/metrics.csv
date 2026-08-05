@@ -350,6 +350,7 @@
 "palaeoverse",2026-07-17,"commits",584
 "palaeoverse",2026-07-21,"commits",586
 "palaeoverse",2026-07-22,"commits",587
+"palaeoverse",2026-08-05,"commits",588
 "palaeoverse",2022-03-11,"contributors",1
 "palaeoverse",2022-05-03,"contributors",2
 "palaeoverse",2022-06-21,"contributors",4
@@ -1924,6 +1925,7 @@
 "palaeoverse",2026-07-17,"lines_of_code",6734
 "palaeoverse",2026-07-21,"lines_of_code",6734
 "palaeoverse",2026-07-22,"lines_of_code",6734
+"palaeoverse",2026-08-05,"lines_of_code",6734
 "palaeoverse",2022-03-11,"mean_cyclomatic_complexity",4
 "palaeoverse",2022-05-02,"mean_cyclomatic_complexity",11.6666666666667
 "palaeoverse",2022-05-03,"mean_cyclomatic_complexity",10.5
@@ -2072,6 +2074,7 @@
 "palaeoverse",2026-07-17,"mean_cyclomatic_complexity",33.36
 "palaeoverse",2026-07-21,"mean_cyclomatic_complexity",33.36
 "palaeoverse",2026-07-22,"mean_cyclomatic_complexity",33.36
+"palaeoverse",2026-08-05,"mean_cyclomatic_complexity",33.36
 "palaeoverse",2022-06-17,"open_issues",2
 "palaeoverse",2022-06-21,"open_issues",3
 "palaeoverse",2022-06-22,"open_issues",3
@@ -2212,11 +2215,11 @@
 "palaeoverse",2026-07-01,"open_pull_requests",8
 "palaeoverse",2026-07-02,"open_pull_requests",9
 "palaeoverse",2026-07-13,"open_pull_requests",11
-"palaeoverse",2026-07-14,"open_pull_requests",15
-"palaeoverse",2026-07-23,"open_pull_requests",16
-"palaeoverse",2026-07-28,"open_pull_requests",18
-"palaeoverse",2026-07-31,"open_pull_requests",19
-"palaeoverse",2026-08-04,"open_pull_requests",20
+"palaeoverse",2026-07-14,"open_pull_requests",14
+"palaeoverse",2026-07-23,"open_pull_requests",15
+"palaeoverse",2026-07-28,"open_pull_requests",17
+"palaeoverse",2026-07-31,"open_pull_requests",18
+"palaeoverse",2026-08-04,"open_pull_requests",19
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
