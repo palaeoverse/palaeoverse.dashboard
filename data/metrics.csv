@@ -1734,6 +1734,7 @@
 "palaeoverse",2026-08-02,"cran_downloads",19492
 "palaeoverse",2026-08-03,"cran_downloads",19492
 "palaeoverse",2026-08-04,"cran_downloads",19492
+"palaeoverse",2026-08-05,"cran_downloads",19492
 "palaeoverse",2022-10-31,"cran_releases",1
 "palaeoverse",2023-01-12,"cran_releases",2
 "palaeoverse",2023-02-16,"cran_releases",3
@@ -2215,6 +2216,7 @@
 "palaeoverse",2026-07-23,"open_pull_requests",16
 "palaeoverse",2026-07-28,"open_pull_requests",18
 "palaeoverse",2026-07-31,"open_pull_requests",19
+"palaeoverse",2026-08-04,"open_pull_requests",20
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -2315,6 +2317,7 @@
 "palaeoverse",2026-07-24,"pull_requests",147
 "palaeoverse",2026-07-28,"pull_requests",149
 "palaeoverse",2026-07-31,"pull_requests",150
+"palaeoverse",2026-08-04,"pull_requests",151
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
@@ -3205,6 +3208,7 @@
 "rmacrostrat",2026-08-02,"cran_downloads",7019
 "rmacrostrat",2026-08-03,"cran_downloads",7019
 "rmacrostrat",2026-08-04,"cran_downloads",7019
+"rmacrostrat",2026-08-05,"cran_downloads",7019
 "rmacrostrat",2024-07-31,"cran_releases",1
 "rmacrostrat",2024-09-17,"cran_releases",2
 "rmacrostrat",2024-10-18,"cran_releases",3
@@ -6445,6 +6449,7 @@
 "rphylopic",2026-08-02,"cran_downloads",51883
 "rphylopic",2026-08-03,"cran_downloads",51883
 "rphylopic",2026-08-04,"cran_downloads",51883
+"rphylopic",2026-08-05,"cran_downloads",51883
 "rphylopic",2018-11-19,"cran_releases",1
 "rphylopic",2020-06-04,"cran_releases",2
 "rphylopic",2023-03-20,"cran_releases",3
@@ -8370,6 +8375,7 @@
 "sepkoski",2026-08-02,"cran_downloads",8913
 "sepkoski",2026-08-03,"cran_downloads",8913
 "sepkoski",2026-08-04,"cran_downloads",8913
+"sepkoski",2026-08-05,"cran_downloads",8913
 "sepkoski",2022-11-23,"cran_releases",1
 "sepkoski",2025-02-24,"forks",1
 "sepkoski",2024-08-20,"github_stars",1
