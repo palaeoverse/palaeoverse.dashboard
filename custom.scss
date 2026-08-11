@@ -186,6 +186,15 @@ body,
   background: $bg-dark;
 }
 
+.card-header>bslib-tooltip {
+  margin-right: auto;
+  color: $brand-dark-grey;
+}
+
+.tooltip-inner {
+  text-align: left;
+}
+
 #quarto-content {
   padding-top: 0 !important;
 }

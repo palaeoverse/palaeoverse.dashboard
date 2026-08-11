@@ -145,23 +145,25 @@ issue_pr_table(open_prs)
 ###### Row
 
 ```{r}
+#| title: !expr 'title_tip("Code coverage (higher is better)", "Share of the lines of code of the package that are run when the test suite is executed.")'
 series$code_coverage |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Code coverage") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |> 
+  e_datazoom(type = "slider") |>
   e_toolbox(show = FALSE) |>
   e_title("Code coverage", subtext = "Higher is better")
 ```
 
 ```{r}
+#| title: !expr 'title_tip("Average cyclomatic complexity (lower is better)", "Cyclomatic complexity counts the number of independent paths through a function (\"if\" conditions, \"for\" and \"while\" loops, etc.). The function complexity increases with the number of paths.")'
 series$mean_cyclomatic_complexity |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Average cyclomatic complexity") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |> 
+  e_datazoom(type = "slider") |>
   e_toolbox(show = FALSE) |>
   e_title("Average cyclomatic complexity", subtext = "Lower is better")
 ```
@@ -170,6 +172,7 @@ series$mean_cyclomatic_complexity |>
 ###### Row
 
 ```{r}
+#| title: !expr 'title_tip("Code coverage (higher is better)", "Share of the lines of code of the package that are run when the test suite is executed.")'
 cov_by_file |>
   reactable(
     columns = list(
@@ -189,6 +192,7 @@ cov_by_file |>
 ```
 
 ```{r}
+#| title: !expr 'title_tip("Average cyclomatic complexity (lower is better)", "Cyclomatic complexity counts the number of independent paths through a function (\"if\" conditions, \"for\" and \"while\" loops, etc.). The function complexity increases with the number of paths.")'
 cyclocomp_by_function |>
   reactable(
     columns = list(

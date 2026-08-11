@@ -55,6 +55,12 @@ vbox <- function(title, icon, value, href = NULL) {
   )
 }
 
+# A card title followed by an info icon that explains the metric on hover.
+# Used as `#| title: !expr title_tip(...)` in a dashboard cell.
+title_tip <- function(title, tip) {
+  paste(title, as.character(bslib::tooltip(bsicons::bs_icon("info-circle"), tip)))
+}
+
 # One "icon + value + label" stat, shown in the overview card's stats grid.
 overview_stat <- function(icon, value, label, pkg = NULL) {
   label <- switch(
