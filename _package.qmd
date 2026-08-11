@@ -10,7 +10,7 @@ series <- package_time_series(pkg)
 # Those don't have an associated time series.
 open_issues <- latest_open_issues(pkg)
 open_prs <- latest_open_prs(pkg)
-cov_by_file <- latest_coverage_by_file(pkg)
+cov_by_function <- latest_coverage_by_function(pkg)
 cyclocomp_by_function <- latest_cyclocomp_by_function(pkg)
 last_release <- latest_release(pkg)
 ```
@@ -173,10 +173,11 @@ series$mean_cyclomatic_complexity |>
 
 ```{r}
 #| title: !expr 'title_tip("Code coverage (higher is better)", "Share of the lines of code of the package that are run when the test suite is executed.")'
-cov_by_file |>
+cov_by_function |>
+  select(-file) |> 
   reactable(
     columns = list(
-      file = colDef(name = "File"),
+      function_name = colDef(name = "Function"),
       coverage = colDef(
         name = "Coverage (%)",
         format = colFormat(digits = 1)
