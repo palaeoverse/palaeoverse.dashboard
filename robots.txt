@@ -1,1 +1,1 @@
-Sitemap: https://palaeoverse.github.io/palaeoverse.dashboard/sitemap.xml
+Sitemap: https://dashboard.palaeoverse.org/sitemap.xml
