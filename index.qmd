@@ -153,7 +153,7 @@ other_overview_card <- function(repo, workflow1, workflow2) {
 ```
 
 
-# Repositories overview
+# Overview
 
 ## Row {.overview-layout}
 
