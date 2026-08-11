@@ -66,6 +66,8 @@ vbox(
 
 ###### Row
 
+####### Column
+
 ```{r}
 # Youtube only reports the views a video has now, so this is a snapshot rather
 # than a series: one point per talk, placed on the day it was published and at
@@ -91,8 +93,28 @@ views_by_video |>
   ) |>
   e_datazoom(type = "slider") |> 
   e_toolbox(show = FALSE) |>
-  e_title("Views per talk", subtext = "By date of publication")
+  e_title("Views per talk")
 ```
+
+```{r}
+lecture_attendance() |>
+  e_charts(x = date) |>
+  e_line(serie = attendees, bind = speaker) |>
+  e_legend(show = FALSE) |>
+  e_tooltip(
+    formatter = htmlwidgets::JS(
+      "function(params) {
+         return params.name + '<br/><strong>' + parseFloat(params.value[1]) +
+           '</strong> attendees on ' + params.value[0];
+       }"
+    )
+  ) |>
+  e_datazoom(type = "slider") |>
+  e_toolbox(show = FALSE) |>
+  e_title("Attendees per talk")
+```
+
+####### Column
 
 ```{r}
 #| title: Views per talk

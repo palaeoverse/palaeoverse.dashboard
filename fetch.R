@@ -326,6 +326,19 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   )
 }
 
+# Number of attendees on Zoom
+update_lecture_attendance <- function() {
+  sheet <- read.csv(.lecture_sheet_csv)
+  data.frame(
+    date = as.Date(sheet[["Date"]], format = "%d/%m/%Y"),
+    speaker = sheet[["Name"]],
+    title = sheet[["Title"]],
+    attendees = suppressWarnings(as.numeric(sheet[["Number.of.attendees"]]))
+  ) |>
+    filter(!is.na(date), !is.na(attendees)) |>
+    arrange(date)
+}
+
 update_youtube_views <- function(existing = NULL) {
   today <- .youtube_views_today()
   today <- today[!is.na(today$views), , drop = FALSE]
@@ -595,6 +608,8 @@ youtube <- update_youtube_views(
   if (file.exists("data/youtube.rds")) readRDS("data/youtube.rds") else NULL
 )
 saveRDS(youtube, "data/youtube.rds")
+
+saveRDS(update_lecture_attendance(), "data/lecture_attendance.rds")
 
 bsky <- update_bsky_stats(
   if (file.exists("data/bsky.rds")) readRDS("data/bsky.rds") else NULL

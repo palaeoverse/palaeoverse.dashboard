@@ -660,6 +660,15 @@ latest_youtube_views_by_video <- function() {
   out
 }
 
+# How many people attended each talk live, one row per talk that has a count
+# (see `update_lecture_attendance()`), oldest first.
+lecture_attendance <- function() {
+  if (!file.exists("data/lecture_attendance.rds")) {
+    return(NULL)
+  }
+  readRDS("data/lecture_attendance.rds")
+}
+
 bsky_posts <- function() {
   if (!file.exists("data/bsky_posts.rds")) {
     return(NULL)
