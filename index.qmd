@@ -272,7 +272,7 @@ pkg <- "sepkoski"
 {{< include _package.qmd >}}
 
 
-# Community
+# Engagement
 
-{{< include _community.qmd >}}
+{{< include _engagement.qmd >}}
 
