@@ -184,7 +184,7 @@ other_overview_card("palaeoverse.dashboard", "render-dashboard.yaml", "refresh-d
 ```
 
 ```{r}
-#| title: palaeoverse.github.io
+#| title: palaeoverse.org
 #| expandable: false
 other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-links.yml")
 ```
