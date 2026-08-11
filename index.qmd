@@ -11,6 +11,14 @@ format:
         href: data/metrics.csv
       - icon: github
         href: https://github.com/palaeoverse/palaeoverse.dashboard
+    include-after-body:
+      # Download metrics.csv instead of opening its content in the tab.
+      text: |
+        <script>
+          document
+            .querySelectorAll('a[href="data/metrics.csv"]')
+            .forEach((a) => a.setAttribute("download", "metrics.csv"));
+        </script>
 author: "Last updated: `r as.character(format(Sys.time()))`"
 
 theme:
