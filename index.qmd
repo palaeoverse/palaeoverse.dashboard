@@ -83,6 +83,11 @@ overview_stat <- function(icon, value, label, pkg = NULL) {
       label, 
       "</a>"
     ),
+    "contributors" = paste0(
+      "<a href='https://github.com/palaeoverse/", pkg, "/contributors' target='_blank'>",
+      label, 
+      "</a>"
+    ),
     label
   ) 
   paste0(
