@@ -131,7 +131,7 @@ pkg_overview_card <- function(pkg) {
     "</div>",
     "<div class=\"overview-stats\">",
     "<div class=\"overview-stats-row\">",
-    overview_stat("people", get_latest(pkg, "contributors"), "contributors"),
+    overview_stat("people", get_latest(pkg, "contributors"), "contributors", pkg = pkg),
     overview_stat("diagram-2", get_latest(pkg, "forks"), "forks"),
     "</div>",
     "<div class=\"overview-stats-row\">",
