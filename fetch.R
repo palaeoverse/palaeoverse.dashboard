@@ -608,7 +608,12 @@ all_metrics <- function(packages) {
     })
   })
 
-  bind_rows(rows) |>
+  rows_website <- website_count_per_day() |>
+    rename(value = count, date = day) |>
+    mutate(pkg = "", metric = "website_visits", date = as.Date(date)) |>
+    select(pkg, date, metric, value)
+
+  bind_rows(rows, rows_website) |>
     arrange(pkg, metric, date)
 }
 
