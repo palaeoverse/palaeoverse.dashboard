@@ -3,6 +3,7 @@ title: "Palaeoverse dashboard"
 logo: _brand/logos/logo.png
 format:
   dashboard:
+    expandable: false
     nav-buttons:
       # Every metric of every package, written by fetch.R and published
       # alongside the dashboard (see `resources` in _quarto.yml)
@@ -174,37 +175,31 @@ other_overview_card <- function(repo, workflow1, workflow2) {
 
 ```{r}
 #| title: palaeoverse
-#| expandable: false
 pkg_overview_card("palaeoverse")
 ```
 
 ```{r}
 #| title: rmacrostrat
-#| expandable: false
 pkg_overview_card("rmacrostrat")
 ```
 
 ```{r}
 #| title: rphylopic
-#| expandable: false
 pkg_overview_card("rphylopic")
 ```
 
 ```{r}
 #| title: sepkoski
-#| expandable: false
 pkg_overview_card("sepkoski")
 ```
 
 ```{r}
 #| title: palaeoverse.dashboard
-#| expandable: false
 other_overview_card("palaeoverse.dashboard", "render-dashboard.yaml", "refresh-data.yaml")
 ```
 
 ```{r}
 #| title: palaeoverse.org
-#| expandable: false
 other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-links.yml")
 ```
 
