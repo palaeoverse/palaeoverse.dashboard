@@ -524,6 +524,30 @@ update_bsky_posts <- function() {
   )
 }
 
+# Get aggregate number of page views per day, since the start
+.goatcounter_count_per_day <- function() {
+  hits <- httr2::request("https://palaeoverse.goatcounter.com") |>
+    httr2::req_url_path_append("api/v0", endpoint) |>
+    httr2::req_url_query(
+      # Date when goatcounter was set up
+      start = "2026-07-13",
+      end = Sys.Date(),
+      limit = 100
+    ) |>
+    httr2::req_auth_bearer_token(Sys.getenv("GOATCOUNTER_TOKEN")) |>
+    # GoatCounter allows 4 requests a second and answers 429 beyond that. A
+    # refresh only makes two, but a retry costs nothing and keeps a throttled
+    # answer from dropping the whole snapshot.
+    httr2::req_retry(max_tries = 3) |>
+    httr2::req_perform() |>
+    httr2::resp_body_json()
+
+  tibblify::tibblify(hits) |>
+    tidyr::unnest_longer(stats) |>
+    tidyr::unnest_wider(stats) |>
+    dplyr::summarize(count = sum(daily), .by = day)
+}
+
 # `id` is the ISO 3166-1 alpha-2 code of the country ("NL"), `name` its display
 # name. Visitors whose country is unknown come back with an empty id.
 .goatcounter_countries <- function() {
@@ -550,7 +574,8 @@ update_website_stats <- function() {
       # dashboard can say which period it is showing
       since = .goatcounter_since(),
       pages = .goatcounter_pages(),
-      countries = .goatcounter_countries()
+      countries = .goatcounter_countries(),
+      count_per_day = .goatcounter_count_per_day()
     ),
     error = function(e) {
       message("goatcounter unavailable: ", conditionMessage(e))

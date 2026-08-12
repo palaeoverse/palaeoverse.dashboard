@@ -35,6 +35,26 @@ bsky_average <- function(metric) {
   }
   round(mean(values), 1)
 }
+
+# Visits to palaeoverse.org and its subdomains over the past month, as reported
+# by GoatCounter. "Visitors" rather than pageviews: GoatCounter counts a person
+# once per page per day.
+site_pages <- website_pages()
+site_countries <- .website_stats()$countries
+# First day of the window covered, as "5 July 2026"
+website_since <- function() {
+  since <- .website_stats()$since
+  if (is.null(since)) {
+    return(NULL)
+  }
+  format(since, "%e %B %Y") |> trimws()
+}
+site_period <- paste("Past 30 days, since", website_since())
+
+missing_token <- paste(
+  "No data collected yet. The GoatCounter API needs a token with the",
+  "\"read statistics\" permission, passed to fetch.R as GOATCOUNTER_TOKEN."
+)
 ```
 
 ### Column {.tabset}
@@ -143,6 +163,8 @@ views_by_video |>
 
 #### Bluesky
 
+##### Column
+
 ###### Row
 
 ```{r}
@@ -220,32 +242,12 @@ bsky_all_posts |>
 
 #### Website
 
-```{r}
-# Visits to palaeoverse.org and its subdomains over the past month, as reported
-# by GoatCounter. "Visitors" rather than pageviews: GoatCounter counts a person
-# once per page per day.
-site_pages <- website_pages()
-site_countries <- .website_stats()$countries
-# First day of the window covered, as "5 July 2026"
-website_since <- function() {
-  since <- .website_stats()$since
-  if (is.null(since)) {
-    return(NULL)
-  }
-  format(since, "%e %B %Y") |> trimws()
-}
-site_period <- paste("Past 30 days, since", website_since())
+##### Row
 
-missing_token <- paste(
-  "No data collected yet. The GoatCounter API needs a token with the",
-  "\"read statistics\" permission, passed to fetch.R as GOATCOUNTER_TOKEN."
-)
-```
-
-####### Row
+###### Column
 
 ```{r}
-#| title: Most visited pages
+#| title: Most visited pages (last 30 days)
 table <- site_pages |>
     mutate(
       # The scheme is the same on every row and only takes up width
@@ -268,17 +270,25 @@ table <- site_pages |>
       searchable = TRUE,
       highlight = TRUE
     )
-  # The chart on the right says which period it covers in its subtitle; this
-  # card has a table rather than a chart, so the same note goes above it.
-  htmltools::tagList(
-    htmltools::tags$p(site_period, class = "card-note"),
-    table
-  )
-
 ```
 
 ```{r}
-#| title: Visitors by country
+website_count_per_day() |>
+  rename(Count = count) |> 
+  e_charts(x = day) |>
+  e_line(serie = Count) |>
+  e_legend(show = FALSE) |>
+  e_datazoom(type = "slider") |> 
+  e_toolbox(show = FALSE) |>
+  e_tooltip(trigger = "axis") |> 
+  e_title("Page views per day")
+```
+
+
+###### Column
+
+```{r}
+#| title: Visitors by country (last 30 days)
   countries_map <- website_countries_map()
   scale <- interpolate_palette(
     data = countries_map,
@@ -302,7 +312,7 @@ table <- site_pages |>
       hover_options = list(fill_opacity = 1)
     ) |>
     add_legend(
-      paste("Visitors since", website_since()),
+      "Visitors",
       values = get_legend_labels(scale, digits = 0),
       colors = get_legend_colors(scale),
       type = "continuous",

@@ -810,6 +810,10 @@ website_countries_map <- function() {
     )
 }
 
+website_count_per_day <- function() {
+  .website_stats()$count_per_day
+}
+
 ####### Badges
 
 .badge <- function(pkg, workflow) {
