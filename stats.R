@@ -124,29 +124,36 @@ ts_forks <- function(pkg) {
   .items_cache[[pkg]]
 }
 
-# One timestamp per item, as a day. An item that doesn't carry the field (an
-# open item has no `closed_at`) contributes NA, which the series drop.
-.item_dates <- function(items, field) {
+# One timestamp per item, as a day. An item that doesn't have it (an open item
+# has no `closed_at`) contributes NA, which the series drop.
+.item_dates <- function(items, get) {
   as.Date(vapply(
     items,
-    function(x) x[[field]] %||% NA_character_,
+    function(x) get(x) %||% NA_character_,
     character(1)
   ))
 }
 
-# The three series a set of issues or pull requests gives: how many have been
-# opened, how many have been closed, and how many are open. The last one adds an
-# item when it is opened and takes it away when it is closed, so its latest
-# value is how many are open right now, while the two others only ever grow, so
-# the difference between two dates is what was opened (closed) in between.
-.ts_items <- function(items, what = c("opened", "closed", "open")) {
+# The series a set of issues or pull requests gives: how many have been opened,
+# closed, merged, and how many are open. The last one adds an item when it is
+# opened and takes it away when it is closed, so its latest value is how many
+# are open right now, while the others only ever grow, so the difference between
+# two dates is what was opened (closed, merged) in between.
+#
+# GitHub closes a pull request when it is merged, so "closed" here is the ones
+# that were turned down rather than every pull request that is no longer open:
+# opened = closed + merged + open. Issues have no `merged_at` at all, which
+# leaves their "closed" series untouched.
+.ts_items <- function(items, what = c("opened", "closed", "merged", "open")) {
   what <- match.arg(what)
-  opened <- .item_dates(items, "created_at")
-  closed <- .item_dates(items, "closed_at")
+  opened <- .item_dates(items, function(x) x$created_at)
+  closed <- .item_dates(items, function(x) x$closed_at)
+  merged <- .item_dates(items, function(x) x$pull_request$merged_at)
   out <- switch(
     what,
     opened = .cumulative_by_day(opened),
-    closed = .cumulative_by_day(closed),
+    closed = .cumulative_by_day(closed[is.na(merged)]),
+    merged = .cumulative_by_day(merged),
     open = .cumulative_by_day(opened, removed = closed)
   )
   out %||% data.frame(date = as.Date(character()), value = numeric(0))
@@ -170,6 +177,10 @@ ts_pull_requests <- function(pkg) {
 
 ts_closed_pull_requests <- function(pkg) {
   .ts_items(.issues_and_prs(pkg)$prs, "closed")
+}
+
+ts_merged_pull_requests <- function(pkg) {
+  .ts_items(.issues_and_prs(pkg)$prs, "merged")
 }
 
 ts_open_pull_requests <- function(pkg) {
@@ -293,6 +304,7 @@ time_series <- list(
   open_issues = ts_open_issues,
   pull_requests = ts_pull_requests,
   closed_pull_requests = ts_closed_pull_requests,
+  merged_pull_requests = ts_merged_pull_requests,
   open_pull_requests = ts_open_pull_requests,
   lines_of_code = ts_loc,
   cran_releases = ts_cran_releases,
