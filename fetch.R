@@ -527,7 +527,7 @@ update_bsky_posts <- function() {
 # Get aggregate number of page views per day, since the start
 .goatcounter_count_per_day <- function() {
   hits <- httr2::request("https://palaeoverse.goatcounter.com") |>
-    httr2::req_url_path_append("api/v0", endpoint) |>
+    httr2::req_url_path_append("api/v0/stats/hits") |>
     httr2::req_url_query(
       # Date when goatcounter was set up
       start = "2026-07-13",
@@ -542,7 +542,7 @@ update_bsky_posts <- function() {
     httr2::req_perform() |>
     httr2::resp_body_json()
 
-  tibblify::tibblify(hits) |>
+  tibblify::tibblify(hits$hits) |>
     tidyr::unnest_longer(stats) |>
     tidyr::unnest_wider(stats) |>
     dplyr::summarize(count = sum(daily), .by = day)
