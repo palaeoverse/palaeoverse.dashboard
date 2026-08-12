@@ -5,3 +5,6 @@ project:
   # download the file instead of displaying it.
   resources:
     - data/metrics.csv
+
+website:
+  favicon: _brand/logos/favicon.png
