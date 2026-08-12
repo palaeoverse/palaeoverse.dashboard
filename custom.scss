@@ -198,3 +198,21 @@ body,
 #quarto-content {
   padding-top: 0 !important;
 }
+
+// Prevent the "Impact" tab from being scrollable.
+@media (min-width: 576px) {
+  body.quarto-dashboard:has(.dashboard-page.active .card.tabset .nav-link.active[data-value="Impact"]) {
+    display: flex;
+    flex-direction: column;
+
+    .quarto-dashboard-content {
+      height: 100%;
+      min-height: 0; // so it shrinks to the space the navbar leaves
+
+      // Written inline by the page navigation, hence `!important`
+      >.tab-content {
+        grid-template-rows: minmax(3em, 1fr) !important;
+      }
+    }
+  }
+}
