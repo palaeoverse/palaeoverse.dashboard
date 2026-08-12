@@ -248,28 +248,28 @@ bsky_all_posts |>
 
 ```{r}
 #| title: Most visited pages (last 30 days)
-table <- site_pages |>
-    mutate(
-      # The scheme is the same on every row and only takes up width
-      url = paste0(
-        "<a href=\"",
-        url,
-        "\" target=\"_blank\">",
-        htmltools::htmlEscape(sub("^https://", "", url)),
-        "</a>"
-      )
-    ) |>
-    select(url, title, visitors) |>
-    reactable(
-      columns = list(
-        url = colDef(name = "Page", html = TRUE),
-        title = colDef(name = "Title"),
-        visitors = colDef(name = "Visitors")
-      ),
-      defaultSorted = list(visitors = "desc"),
-      searchable = TRUE,
-      highlight = TRUE
+site_pages |>
+  mutate(
+    # The scheme is the same on every row and only takes up width
+    url = paste0(
+      "<a href=\"",
+      url,
+      "\" target=\"_blank\">",
+      htmltools::htmlEscape(sub("^https://", "", url)),
+      "</a>"
     )
+  ) |>
+  select(url, title, visitors) |>
+  reactable(
+    columns = list(
+      url = colDef(name = "Page", html = TRUE),
+      title = colDef(name = "Title"),
+      visitors = colDef(name = "Visitors")
+    ),
+    defaultSorted = list(visitors = "desc"),
+    searchable = TRUE,
+    highlight = TRUE
+  )
 ```
 
 ```{r}
