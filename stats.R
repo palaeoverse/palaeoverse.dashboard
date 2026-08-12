@@ -105,63 +105,75 @@ ts_forks <- function(pkg) {
   .cumulative_by_day(vapply(forks, function(x) x$created_at, character(1)))
 }
 
-# Issues open on a given day: an issue adds to the total when it is opened and
-# takes away from it when it is closed. The issues endpoint returns pull
-# requests too, so entries carrying a `pull_request` field are dropped to count
-# genuine issues only.
-ts_open_issues <- function(pkg) {
-  issues <- gh(
-    "GET /repos/palaeoverse/{pkg}/issues?state=all",
-    pkg = pkg,
-    .limit = Inf
-  ) |>
-    Filter(f = function(x) is.null(x$pull_request))
+# Every issue and every pull request of a repository, fetched once per package:
+# the issues endpoint returns both, and entries carrying a `pull_request` field
+# are the pull requests. Everything below (the series, the tables of open items
+# and the response times) is derived from this single paginated call.
+.items_cache <- new.env(parent = emptyenv())
 
-  out <- .cumulative_by_day(
-    times = vapply(issues, function(x) x$created_at, character(1)),
-    removed = vapply(
-      issues,
-      function(x) x$closed_at %||% NA_character_,
-      character(1)
+.issues_and_prs <- function(pkg) {
+  if (is.null(.items_cache[[pkg]])) {
+    items <- gh(
+      "GET /repos/palaeoverse/{pkg}/issues?state=all",
+      pkg = pkg,
+      .limit = Inf
     )
-  )
-  if (is.null(out)) {
-    data.frame(date = as.Date(character()), value = numeric(0))
-  } else {
-    out
+    is_pr <- vapply(items, function(x) !is.null(x$pull_request), logical(1))
+    .items_cache[[pkg]] <- list(issues = items[!is_pr], prs = items[is_pr])
   }
+  .items_cache[[pkg]]
+}
+
+# One timestamp per item, as a day. An item that doesn't carry the field (an
+# open item has no `closed_at`) contributes NA, which the series drop.
+.item_dates <- function(items, field) {
+  as.Date(vapply(
+    items,
+    function(x) x[[field]] %||% NA_character_,
+    character(1)
+  ))
+}
+
+# The three series a set of issues or pull requests gives: how many have been
+# opened, how many have been closed, and how many are open. The last one adds an
+# item when it is opened and takes it away when it is closed, so its latest
+# value is how many are open right now, while the two others only ever grow, so
+# the difference between two dates is what was opened (closed) in between.
+.ts_items <- function(items, what = c("opened", "closed", "open")) {
+  what <- match.arg(what)
+  opened <- .item_dates(items, "created_at")
+  closed <- .item_dates(items, "closed_at")
+  out <- switch(
+    what,
+    opened = .cumulative_by_day(opened),
+    closed = .cumulative_by_day(closed),
+    open = .cumulative_by_day(opened, removed = closed)
+  )
+  out %||% data.frame(date = as.Date(character()), value = numeric(0))
+}
+
+ts_issues <- function(pkg) {
+  .ts_items(.issues_and_prs(pkg)$issues, "opened")
+}
+
+ts_closed_issues <- function(pkg) {
+  .ts_items(.issues_and_prs(pkg)$issues, "closed")
+}
+
+ts_open_issues <- function(pkg) {
+  .ts_items(.issues_and_prs(pkg)$issues, "open")
 }
 
 ts_pull_requests <- function(pkg) {
-  prs <- gh(
-    "GET /repos/palaeoverse/{pkg}/pulls?state=all",
-    pkg = pkg,
-    .limit = Inf
-  )
-  .cumulative_by_day(vapply(prs, function(x) x$created_at, character(1)))
+  .ts_items(.issues_and_prs(pkg)$prs, "opened")
+}
+
+ts_closed_pull_requests <- function(pkg) {
+  .ts_items(.issues_and_prs(pkg)$prs, "closed")
 }
 
 ts_open_pull_requests <- function(pkg) {
-  open_prs <- gh(
-    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
-    pkg = pkg,
-    .limit = Inf
-  ) |>
-    Filter(f = function(x) is.null(x$pull_request))
-
-  out <- .cumulative_by_day(
-    times = vapply(open_prs, function(x) x$created_at, character(1)),
-    removed = vapply(
-      open_prs,
-      function(x) x$closed_at %||% NA_character_,
-      character(1)
-    )
-  )
-  if (is.null(out)) {
-    data.frame(date = as.Date(character()), value = numeric(0))
-  } else {
-    out
-  }
+  .ts_items(.issues_and_prs(pkg)$prs, "open")
 }
 
 # A commit is attributed to a GitHub account when its email is known there, and
@@ -276,8 +288,11 @@ time_series <- list(
   github_stars = ts_stars,
   contributors = ts_contributors,
   forks = ts_forks,
+  issues = ts_issues,
+  closed_issues = ts_closed_issues,
   open_issues = ts_open_issues,
   pull_requests = ts_pull_requests,
+  closed_pull_requests = ts_closed_pull_requests,
   open_pull_requests = ts_open_pull_requests,
   lines_of_code = ts_loc,
   cran_releases = ts_cran_releases,
@@ -348,47 +363,30 @@ latest_release <- function(pkg) {
   )
 }
 
-latest_open_issues <- function(pkg) {
-  issues <- gh(
-    "GET /repos/palaeoverse/{pkg}/issues?state=open",
-    pkg = pkg,
-    .limit = Inf
-  ) |>
-    Filter(f = function(x) is.null(x$pull_request))
-
+# The items of `items` that are still open, one row each: what it is called, who
+# opened it and when, and where to find it on GitHub.
+.open_items <- function(items) {
+  items <- Filter(function(x) x$state == "open", items)
   tibble(
-    number = vapply(issues, function(x) as.integer(x$number), integer(1)),
-    title = vapply(issues, function(x) x$title, character(1)),
-    author = vapply(issues, function(x) x$user$login, character(1)),
+    number = vapply(items, function(x) as.integer(x$number), integer(1)),
+    title = vapply(items, function(x) x$title, character(1)),
+    author = vapply(items, function(x) x$user$login, character(1)),
     opened = as.Date(.as_time(vapply(
-      issues,
+      items,
       function(x) x$created_at,
       character(1)
     ))),
-    url = vapply(issues, function(x) x$html_url, character(1))
+    url = vapply(items, function(x) x$html_url, character(1))
   ) |>
     arrange(desc(opened))
 }
 
-latest_open_prs <- function(pkg) {
-  prs <- gh(
-    "GET /repos/palaeoverse/{pkg}/pulls?state=open",
-    pkg = pkg,
-    .limit = Inf
-  )
+latest_open_issues <- function(pkg) {
+  .open_items(.issues_and_prs(pkg)$issues)
+}
 
-  tibble(
-    number = vapply(prs, function(x) as.integer(x$number), integer(1)),
-    title = vapply(prs, function(x) x$title, character(1)),
-    author = vapply(prs, function(x) x$user$login, character(1)),
-    opened = as.Date(.as_time(vapply(
-      prs,
-      function(x) x$created_at,
-      character(1)
-    ))),
-    url = vapply(prs, function(x) x$html_url, character(1))
-  ) |>
-    arrange(desc(opened))
+latest_open_prs <- function(pkg) {
+  .open_items(.issues_and_prs(pkg)$prs)
 }
 
 # GitHub tags every issue and every comment with an `author_association`:
@@ -436,17 +434,8 @@ issue_response_times <- function(pkg) {
     return(.response_times_cache[[pkg]])
   }
 
-  # The issues endpoint returns pull requests too, so entries carrying a
-  # `pull_request` field are dropped to keep genuine issues only.
-  issues <- gh(
-    "GET /repos/palaeoverse/{pkg}/issues?state=all",
-    pkg = pkg,
-    .limit = Inf
-  ) |>
-    Filter(f = function(x) {
-      is.null(x$pull_request) &&
-        !x$author_association %in% .member_associations
-    })
+  issues <- .issues_and_prs(pkg)$issues |>
+    Filter(f = function(x) !x$author_association %in% .member_associations)
 
   out <- tibble(
     pkg = pkg,
