@@ -29,6 +29,7 @@ Imports:
     rmarkdown,
     rvest,
     sf,
+    tibblify,
     tidyr,
     xml2
 Remotes:
