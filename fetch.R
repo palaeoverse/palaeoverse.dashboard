@@ -608,6 +608,9 @@ all_metrics <- function(packages) {
     })
   })
 
+  rows <- unlist(rows, recursive = FALSE)
+  rows <- Filter(Negate(is.null), rows)
+
   rows_website <- website_count_per_day() |>
     rename(value = count, date = day) |>
     mutate(pkg = "", metric = "website_visits", date = as.Date(date)) |>
