@@ -469,6 +469,7 @@
 "palaeoverse",2026-08-05,"commits",588
 "palaeoverse",2026-08-20,"commits",593
 "palaeoverse",2026-08-24,"commits",605
+"palaeoverse",2026-08-25,"commits",606
 "palaeoverse",2022-03-11,"contributors",1
 "palaeoverse",2022-05-03,"contributors",2
 "palaeoverse",2022-06-21,"contributors",4
@@ -2154,6 +2155,7 @@
 "palaeoverse",2026-08-05,"lines_of_code",6734
 "palaeoverse",2026-08-20,"lines_of_code",6743
 "palaeoverse",2026-08-24,"lines_of_code",8057
+"palaeoverse",2026-08-25,"lines_of_code",8057
 "palaeoverse",2022-03-11,"mean_cyclomatic_complexity",4
 "palaeoverse",2022-05-02,"mean_cyclomatic_complexity",11.6666666666667
 "palaeoverse",2022-05-03,"mean_cyclomatic_complexity",10.5
@@ -2305,6 +2307,7 @@
 "palaeoverse",2026-08-05,"mean_cyclomatic_complexity",33.36
 "palaeoverse",2026-08-20,"mean_cyclomatic_complexity",33.36
 "palaeoverse",2026-08-24,"mean_cyclomatic_complexity",35
+"palaeoverse",2026-08-25,"mean_cyclomatic_complexity",35
 "palaeoverse",2022-06-21,"merged_pull_requests",3
 "palaeoverse",2022-07-15,"merged_pull_requests",5
 "palaeoverse",2022-07-18,"merged_pull_requests",6
@@ -2387,6 +2390,7 @@
 "palaeoverse",2026-08-05,"merged_pull_requests",121
 "palaeoverse",2026-08-20,"merged_pull_requests",126
 "palaeoverse",2026-08-24,"merged_pull_requests",138
+"palaeoverse",2026-08-25,"merged_pull_requests",139
 "palaeoverse",2022-06-17,"open_issues",2
 "palaeoverse",2022-06-21,"open_issues",3
 "palaeoverse",2022-06-22,"open_issues",3
@@ -2672,6 +2676,7 @@
 "palaeoverse",2026-08-10,"open_pull_requests",22
 "palaeoverse",2026-08-20,"open_pull_requests",19
 "palaeoverse",2026-08-24,"open_pull_requests",8
+"palaeoverse",2026-08-25,"open_pull_requests",9
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -2778,6 +2783,7 @@
 "palaeoverse",2026-08-10,"pull_requests",154
 "palaeoverse",2026-08-20,"pull_requests",156
 "palaeoverse",2026-08-24,"pull_requests",158
+"palaeoverse",2026-08-25,"pull_requests",160
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
@@ -7660,6 +7666,7 @@
 "rphylopic",2026-05-18,"open_pull_requests",3
 "rphylopic",2026-07-07,"open_pull_requests",1
 "rphylopic",2026-07-20,"open_pull_requests",1
+"rphylopic",2026-08-25,"open_pull_requests",2
 "rphylopic",2014-07-08,"pull_requests",1
 "rphylopic",2014-09-18,"pull_requests",2
 "rphylopic",2015-07-02,"pull_requests",3
@@ -7701,6 +7708,7 @@
 "rphylopic",2026-05-18,"pull_requests",50
 "rphylopic",2026-07-07,"pull_requests",52
 "rphylopic",2026-07-20,"pull_requests",53
+"rphylopic",2026-08-25,"pull_requests",54
 "rphylopic",2018-12-01,"reverse_dependencies",0
 "rphylopic",2019-01-01,"reverse_dependencies",0
 "rphylopic",2019-02-01,"reverse_dependencies",0
