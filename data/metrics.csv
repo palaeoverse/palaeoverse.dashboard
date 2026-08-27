@@ -43,7 +43,8 @@
 "",2026-08-23,"website_visits",27
 "",2026-08-24,"website_visits",40
 "",2026-08-25,"website_visits",24
-"",2026-08-26,"website_visits",0
+"",2026-08-26,"website_visits",29
+"",2026-08-27,"website_visits",5
 "palaeoverse",2022-09-03,"citations",1
 "palaeoverse",2022-10-17,"citations",2
 "palaeoverse",2022-10-31,"citations",3
@@ -2687,6 +2688,7 @@
 "palaeoverse",2026-08-24,"open_pull_requests",8
 "palaeoverse",2026-08-25,"open_pull_requests",8
 "palaeoverse",2026-08-26,"open_pull_requests",9
+"palaeoverse",2026-08-27,"open_pull_requests",11
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -2795,6 +2797,7 @@
 "palaeoverse",2026-08-24,"pull_requests",158
 "palaeoverse",2026-08-25,"pull_requests",160
 "palaeoverse",2026-08-26,"pull_requests",162
+"palaeoverse",2026-08-27,"pull_requests",164
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
