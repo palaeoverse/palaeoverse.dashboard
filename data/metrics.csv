@@ -484,7 +484,7 @@
 "palaeoverse",2026-08-25,"commits",607
 "palaeoverse",2026-08-26,"commits",608
 "palaeoverse",2026-08-28,"commits",612
-"palaeoverse",2026-09-01,"commits",613
+"palaeoverse",2026-09-01,"commits",614
 "palaeoverse",2022-03-11,"contributors",1
 "palaeoverse",2022-05-03,"contributors",2
 "palaeoverse",2022-06-21,"contributors",4
@@ -2183,7 +2183,7 @@
 "palaeoverse",2026-08-25,"lines_of_code",8034
 "palaeoverse",2026-08-26,"lines_of_code",8034
 "palaeoverse",2026-08-28,"lines_of_code",8034
-"palaeoverse",2026-09-01,"lines_of_code",8034
+"palaeoverse",2026-09-01,"lines_of_code",8568
 "palaeoverse",2022-03-11,"mean_cyclomatic_complexity",4
 "palaeoverse",2022-05-02,"mean_cyclomatic_complexity",11.6666666666667
 "palaeoverse",2022-05-03,"mean_cyclomatic_complexity",10.5
@@ -2338,7 +2338,7 @@
 "palaeoverse",2026-08-25,"mean_cyclomatic_complexity",35
 "palaeoverse",2026-08-26,"mean_cyclomatic_complexity",35
 "palaeoverse",2026-08-28,"mean_cyclomatic_complexity",35
-"palaeoverse",2026-09-01,"mean_cyclomatic_complexity",34.88
+"palaeoverse",2026-09-01,"mean_cyclomatic_complexity",23.7209302325581
 "palaeoverse",2022-06-21,"merged_pull_requests",3
 "palaeoverse",2022-07-15,"merged_pull_requests",5
 "palaeoverse",2022-07-18,"merged_pull_requests",6
@@ -2424,7 +2424,7 @@
 "palaeoverse",2026-08-25,"merged_pull_requests",140
 "palaeoverse",2026-08-26,"merged_pull_requests",141
 "palaeoverse",2026-08-28,"merged_pull_requests",142
-"palaeoverse",2026-09-01,"merged_pull_requests",143
+"palaeoverse",2026-09-01,"merged_pull_requests",144
 "palaeoverse",2022-06-17,"open_issues",2
 "palaeoverse",2022-06-21,"open_issues",3
 "palaeoverse",2022-06-22,"open_issues",3
@@ -2716,7 +2716,7 @@
 "palaeoverse",2026-08-26,"open_pull_requests",9
 "palaeoverse",2026-08-27,"open_pull_requests",11
 "palaeoverse",2026-08-28,"open_pull_requests",13
-"palaeoverse",2026-09-01,"open_pull_requests",13
+"palaeoverse",2026-09-01,"open_pull_requests",12
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
