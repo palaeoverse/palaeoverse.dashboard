@@ -36,7 +36,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
 
       - name: Refresh data
-        run: Rscript fetch.R
+        run: Rscript -e 'source("scripts/_general.R"); update_statistics()'
 
       - name: Commit updated data
         run: |

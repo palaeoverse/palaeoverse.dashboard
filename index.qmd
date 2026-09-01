@@ -5,8 +5,8 @@ format:
   dashboard:
     expandable: false
     nav-buttons:
-      # Every metric of every package, written by fetch.R and published
-      # alongside the dashboard (see `resources` in _quarto.yml)
+      # Every metric of every package, written by `update_statistics()` and
+      # published alongside the dashboard (see `resources` in _quarto.yml)
       - icon: download
         text: Download data
         href: data/metrics.csv
@@ -35,14 +35,12 @@ execute:
 library(bslib)
 library(dplyr)
 library(ggplot2)
-library(gh)
-library(cranlogs)
 library(reactable)
 library(echarts4r)
 library(mapgl)
 library(tidyr)
 
-source("stats.R")
+source("scripts/_general.R")
 
 pkgs <- c("palaeoverse", "rmacrostrat", "rphylopic", "sepkoski")
 
@@ -104,14 +102,14 @@ overview_stat <- function(icon, value, label, pkg = NULL) {
 }
 
 # Body of one overview card: CRAN check status, the R-CMD-check badge, the
-# Codecov badge (all built in stats.R) and a small grid of repository stats.
+# Codecov badge (all built in scripts/) and a small grid of repository stats.
 # The card itself and its header (the package name) are provided by the
 # dashboard cell + its `title` option.
 pkg_overview_card <- function(pkg) {
   last_release <- latest_release(pkg)
   htmltools::HTML(paste0(
     "<div class=\"overview-cran\"><strong>CRAN checks:</strong> ",
-    latest_cran_checks(pkg),
+    cran_checks(pkg),
     "</div>",
     "<span class=\"last-cran-update\"><strong>Last CRAN release:</strong><br>",
     last_release[["date"]],
@@ -132,19 +130,19 @@ pkg_overview_card <- function(pkg) {
     "</div>",
     "<div class=\"overview-stats\">",
     "<div class=\"overview-stats-row\">",
-    overview_stat("people", get_latest(pkg, "contributors"), "contributors", pkg = pkg),
-    overview_stat("diagram-2", get_latest(pkg, "forks"), "forks"),
+    overview_stat("people", get_latest("contributors", pkg), "contributors", pkg = pkg),
+    overview_stat("diagram-2", get_latest("forks", pkg), "forks"),
     "</div>",
     "<div class=\"overview-stats-row\">",
     overview_stat(
       "exclamation-circle",
-      get_latest(pkg, "open_issues"),
+      get_latest("open_issues", pkg),
       "open issues", 
       pkg = pkg
     ),
     overview_stat(
       "git", 
-      get_latest(pkg, "open_pull_requests"), 
+      get_latest("open_pull_requests", pkg), 
       "open PRs", 
       pkg = pkg
     ),
@@ -208,7 +206,7 @@ other_overview_card("palaeoverse.github.io", "deploy-github-pages.yml", "check-l
 ```{r}
 #| title: Cumulative number of CRAN downloads
 series <- lapply(pkgs, function(pkg) {
-  out <- package_time_series(pkg)[["cran_downloads"]][c("date", "value")]
+  out <- get_statistics("cran_downloads", pkg)
   names(out)[2] <- pkg
   out
 })
@@ -230,7 +228,7 @@ Reduce(function(x, y) full_join(x, y, by = "date"), series) |>
 ```{r}
 #| title: Cumulative number of GitHub stars
 series <- lapply(pkgs, function(pkg) {
-  out <- package_time_series(pkg)[["github_stars"]][c("date", "value")]
+  out <- get_statistics("github_stars", pkg)
   names(out)[2] <- pkg
   out
 })

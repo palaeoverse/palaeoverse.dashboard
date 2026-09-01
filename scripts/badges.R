@@ -5,21 +5,21 @@
     "<a rel=\"noopener\" target=\"_blank\" href=\"https://github.com/palaeoverse/",
     pkg,
     "/actions?query=workflow%3A",
-    workflow,
+    sub("\\.ya?ml$", "", workflow),
     "+branch%3Amain\"><img src=\"https://github.com/palaeoverse/",
     pkg,
     "/actions/workflows/",
     workflow,
-    ".yaml/badge.svg?branch=main\"></a>"
+    "/badge.svg?branch=main\"></a>"
   )
 }
 
 badge_ci <- function(pkg) {
-  .badge(pkg, "R-CMD-check")
+  .badge(pkg, "R-CMD-check.yaml")
 }
 
 badge_pkgdown <- function(pkg) {
-  .badge(pkg, "pkgdown")
+  .badge(pkg, "pkgdown.yaml")
 }
 
 badge_coverage <- function(pkg) {

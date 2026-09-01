@@ -2,17 +2,12 @@
 ```{r}
 # Unlike every tab above, this one is about the organisation as a whole rather
 # than about one package: one tab per channel the community is reached through.
-views_by_video <- latest_youtube_views_by_video()
+views_by_video <- youtube_views_by_video()
 
 # The feed carries every post ever made, with the date it was written and the
 # likes and reposts it has gathered since (those are the numbers each post has
 # now, not what it had then).
 bsky_all_posts <- bsky_posts()
-
-no_feed <- paste(
-  "No posts collected yet: the Bluesky feed could not be read the last time",
-  "the data was refreshed."
-)
 
 # Posts run long and hold newlines, so both the table and the chart show the
 # opening of a post rather than the whole of it.
@@ -26,7 +21,7 @@ bsky_excerpt <- function(text, n = 140) {
 
 # What a post gathers on average. Like the counters above, these are the numbers
 # the posts hold now rather than what they held when they were written.
-# `replies` is read from the feed only as of this version of fetch.R, so it is
+# `replies` is read from the feed only as of the current collector, so it is
 # missing from posts collected before the next refresh.
 bsky_average <- function(metric) {
   values <- bsky_all_posts[[metric]]
@@ -40,21 +35,6 @@ bsky_average <- function(metric) {
 # by GoatCounter. "Visitors" rather than pageviews: GoatCounter counts a person
 # once per page per day.
 site_pages <- website_pages()
-site_countries <- .website_stats()$countries
-# First day of the window covered, as "5 July 2026"
-website_since <- function() {
-  since <- .website_stats()$since
-  if (is.null(since)) {
-    return(NULL)
-  }
-  format(since, "%e %B %Y") |> trimws()
-}
-site_period <- paste("Past 30 days, since", website_since())
-
-missing_token <- paste(
-  "No data collected yet. The GoatCounter API needs a token with the",
-  "\"read statistics\" permission, passed to fetch.R as GOATCOUNTER_TOKEN."
-)
 ```
 
 ### Column {.tabset}
@@ -86,7 +66,7 @@ vbox(
 
 ```{r}
 #| output: asis
-vbox("Subscribers", "person-plus", latest_youtube_subscribers())
+vbox("Subscribers", "person-plus", get_latest("youtube_subscribers"))
 ```
 
 ###### Row
@@ -174,12 +154,12 @@ views_by_video |>
 
 ```{r}
 #| output: asis
-vbox("Followers", "people", latest_bsky("followers"))
+vbox("Followers", "people", get_latest("bsky_followers"))
 ```
 
 ```{r}
 #| output: asis
-# The profile counter (`latest_bsky("posts")`) also counts replies and the
+# The profile counter (`get_latest("bsky_posts")`) also counts replies and the
 # account's reposts of other people's posts, which the feed below leaves out;
 # counting the feed keeps this card and the chart on the same number.
 vbox("Posts", "chat-text", NROW(bsky_all_posts))

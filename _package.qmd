@@ -4,18 +4,6 @@ and produces the same layout and output types for all tabs.
 -->
 
 ```{r}
-# Every metric that has a time series. 
-series <- package_time_series(pkg)
-
-# Those don't have an associated time series.
-open_issues <- latest_open_issues(pkg)
-open_prs <- latest_open_prs(pkg)
-cov_by_function <- latest_coverage_by_function(pkg)
-cyclocomp_by_function <- latest_cyclocomp_by_function(pkg)
-last_release <- latest_release(pkg)
-```
-
-```{r}
 # The open issues and the open pull requests of a package are listed the same
 # way: the title links to GitHub, the rest says who opened it and when.
 issue_pr_table <- function(items) {
@@ -55,12 +43,12 @@ issue_pr_table <- function(items) {
 
 ```{r}
 #| output: asis
-vbox("Number of contributors", "people", get_latest(pkg, "contributors"))
+vbox("Number of contributors", "people", get_latest("contributors", pkg))
 ```
 
 ```{r}
 #| output: asis
-vbox("Number of forks", "diagram-2", get_latest(pkg, "forks", default_return = 0))
+vbox("Number of forks", "diagram-2", get_latest("forks", pkg, default_return = 0))
 ```
 
 
@@ -69,7 +57,7 @@ vbox("Number of forks", "diagram-2", get_latest(pkg, "forks", default_return = 0
 vbox(
   "Number of open issues",
   "exclamation-circle",
-  get_latest(pkg, "open_issues", default_return = 0),
+  get_latest("open_issues", pkg, default_return = 0),
   href = paste0("https://github.com/palaeoverse/", pkg, "/issues")
 )
 ```
@@ -79,7 +67,7 @@ vbox(
 vbox(
   "Number of open pull requests",
   "git",
-  get_latest(pkg, "open_pull_requests", default_return = 0),
+  get_latest("open_pull_requests", pkg, default_return = 0),
   href = paste0("https://github.com/palaeoverse/", pkg, "/pulls")
 )
 ```
@@ -98,14 +86,14 @@ vbox(
 vbox(
   "Weeks since last CRAN update",
   "arrow-counterclockwise",
-  last_release[["n_weeks"]]
+  latest_release(pkg)[["n_weeks"]]
 )
 ```
 
 ###### Row
 
 ```{r}
-series$commits |>
+get_statistics("commits", pkg) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
@@ -117,7 +105,7 @@ series$commits |>
 
 
 ```{r}
-series$lines_of_code |>
+get_statistics("lines_of_code", pkg) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Number of lines of code") |>
   e_legend(show = FALSE) |>
@@ -131,12 +119,12 @@ series$lines_of_code |>
 
 ```{r}
 #| title: Open issues
-issue_pr_table(open_issues)
+issue_pr_table(open_issues(pkg))
 ```
 
 ```{r}
 #| title: Open pull requests
-issue_pr_table(open_prs)
+issue_pr_table(open_prs(pkg))
 ```
 
 
@@ -146,7 +134,7 @@ issue_pr_table(open_prs)
 
 ```{r}
 #| title: !expr 'title_tip("Code coverage (higher is better)", "Share of the lines of code of the package that are run when the test suite is executed.")'
-series$code_coverage |>
+get_statistics("code_coverage", pkg) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Code coverage") |>
   e_legend(show = FALSE) |>
@@ -158,7 +146,7 @@ series$code_coverage |>
 
 ```{r}
 #| title: !expr 'title_tip("Average cyclomatic complexity (lower is better)", "Cyclomatic complexity counts the number of independent paths through a function (\"if\" conditions, \"for\" and \"while\" loops, etc.). The function complexity increases with the number of paths.")'
-series$mean_cyclomatic_complexity |>
+get_statistics("mean_cyclomatic_complexity", pkg) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Average cyclomatic complexity") |>
   e_legend(show = FALSE) |>
@@ -173,8 +161,7 @@ series$mean_cyclomatic_complexity |>
 
 ```{r}
 #| title: !expr 'title_tip("Code coverage (higher is better)", "Share of the lines of code of the package that are run when the test suite is executed.")'
-cov_by_function |>
-  select(-file) |> 
+coverage_by_function(pkg) |>
   reactable(
     columns = list(
       function_name = colDef(name = "Function"),
@@ -194,7 +181,7 @@ cov_by_function |>
 
 ```{r}
 #| title: !expr 'title_tip("Average cyclomatic complexity (lower is better)", "Cyclomatic complexity counts the number of independent paths through a function (\"if\" conditions, \"for\" and \"while\" loops, etc.). The function complexity increases with the number of paths.")'
-cyclocomp_by_function |>
+cyclocomp_by_function(pkg) |>
   reactable(
     columns = list(
       function_name = colDef(name = "Function"),
@@ -212,17 +199,17 @@ cyclocomp_by_function |>
 
 ```{r}
 #| output: asis
-vbox("CRAN downloads", "cloud-download", get_latest(pkg, "cran_downloads"))
+vbox("CRAN downloads", "cloud-download", get_latest("cran_downloads", pkg))
 ```
 
 ```{r}
 #| output: asis
-vbox("GitHub stars", "star", get_latest(pkg, "github_stars", default_return = 0))
+vbox("GitHub stars", "star", get_latest("github_stars", pkg, default_return = 0))
 ```
 
 ```{r}
 #| output: asis
-vbox("Citations", "book", get_latest(pkg, "citations", default_return = 0))
+vbox("Citations", "book", get_latest("citations", pkg, default_return = 0))
 ```
 
 ```{r}
@@ -230,7 +217,7 @@ vbox("Citations", "book", get_latest(pkg, "citations", default_return = 0))
 vbox(
   "Reverse dependencies",
   "boxes",
-  get_latest(pkg, "reverse_dependencies", default_return = 0)
+  get_latest("reverse_dependencies", pkg, default_return = 0)
 )
 ```
 
@@ -238,7 +225,7 @@ vbox(
 
 ```{r}
 # One point a week is plenty for a series this long, and much lighter to draw
-series$cran_downloads |>
+get_statistics("cran_downloads", pkg) |>
   slice(seq(1, n(), by = 7)) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Cumulative number") |>
@@ -251,7 +238,7 @@ series$cran_downloads |>
 
 
 ```{r}
-series$github_stars |>
+get_statistics("github_stars", pkg) |>
   e_charts(x = date) |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>

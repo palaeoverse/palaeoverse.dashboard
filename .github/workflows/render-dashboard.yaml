@@ -22,11 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     # workflow_run fires on failure too, so only render after a successful refresh
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    env:
-      # Authenticated GitHub API calls (gh::gh()) get a higher rate limit
-      GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
-      # Codecov API access for coverage/cyclomatic-complexity stats (stats.R)
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
