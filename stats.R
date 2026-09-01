@@ -328,6 +328,20 @@ package_time_series <- function(pkg) {
 }
 
 
+# Where the channel stands each day it was measured.
+ts_youtube_subscribers <- function() {
+  if (!file.exists("data/youtube_channel.rds")) {
+    return(NULL)
+  }
+  stats <- readRDS("data/youtube_channel.rds")
+  if (!NROW(stats)) {
+    return(NULL)
+  }
+  stats |>
+    select(date, value = subscribers) |>
+    arrange(date)
+}
+
 ts_bsky <- function(metric = c("followers", "posts")) {
   metric <- match.arg(metric)
   if (!file.exists("data/bsky.rds")) {
@@ -706,14 +720,11 @@ latest_youtube_views <- function() {
 # holds one measurement per day (see `update_youtube_subscribers()`), so this is
 # the last point of a series rather than a sum over the talks.
 latest_youtube_subscribers <- function() {
-  if (!file.exists("data/youtube_channel.rds")) {
-    return(NA)
-  }
-  stats <- readRDS("data/youtube_channel.rds")
+  stats <- ts_youtube_subscribers()
   if (!NROW(stats)) {
     return(NA)
   }
-  stats$subscribers[which.max(stats$date)]
+  stats$value[which.max(stats$date)]
 }
 
 # The same views, but split by talk: one row per recorded talk with its current

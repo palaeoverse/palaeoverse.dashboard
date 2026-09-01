@@ -640,7 +640,25 @@ all_metrics <- function(packages) {
     mutate(pkg = "", metric = "website_visits", date = as.Date(date)) |>
     select(pkg, date, metric, value)
 
-  bind_rows(rows, rows_website) |>
+  # Youtube belongs to the organisation as a whole rather than to one package,
+  # so its series carry an empty `pkg` like the website visits above.
+  org_rows <- function(series, metric) {
+    if (!NROW(series)) {
+      return(NULL)
+    }
+    data.frame(
+      pkg = "",
+      date = series$date,
+      metric = metric,
+      value = series$value
+    )
+  }
+
+  bind_rows(
+    rows,
+    rows_website,
+    org_rows(ts_youtube_subscribers(), "youtube_subscribers")
+  ) |>
     arrange(pkg, metric, date)
 }
 
