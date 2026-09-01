@@ -20,6 +20,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.DASHBOARD_PAT }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
+      YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
     steps:
       - uses: actions/checkout@v4
 

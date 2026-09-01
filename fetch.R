@@ -239,88 +239,76 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   ))
 }
 
-# We just need the video title, its date, and the number of views, all of
-# which is publicly available from the video page. Youtube API is complicated to
-# set up and use so we just scrape the page of all videos.
-.youtube_video_details <- function(video_id) {
-  page <- httr2::request("https://www.youtube.com/watch") |>
-    httr2::req_url_query(v = video_id, hl = "en") |>
-    httr2::req_headers(
-      `User-Agent` = paste(
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
-        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-      ),
-      `Accept-Language` = "en-US,en;q=0.9",
-      # The cookies the consent screen sets once it has been dismissed
-      Cookie = "CONSENT=YES+cb; SOCS=CAI"
+# We just need the video title, its date, and the number of views, all of which
+# the Data API reports for public videos given an API key alone (`YOUTUBE_KEY`);
+# none of this is private user data, so no OAuth is involved. Reading the video
+# page directly works from a desktop but not from CI, where Youtube answers a
+# bot check instead of the page.
+.youtube_api_videos <- function(ids) {
+  httr2::request("https://www.googleapis.com/youtube/v3/videos") |>
+    httr2::req_url_query(
+      part = "snippet,statistics",
+      id = paste(ids, collapse = ","),
+      key = Sys.getenv("YOUTUBE_KEY")
     ) |>
     httr2::req_retry(max_tries = 3) |>
     httr2::req_perform() |>
-    httr2::resp_body_string() |>
-    rvest::read_html()
-
-  scripts <- page |>
-    rvest::html_elements("script") |>
-    rvest::html_text2()
-
-  js <- scripts[grepl("ytInitialPlayerResponse", scripts, fixed = TRUE)][1]
-  m <- regmatches(js, regexpr('"viewCount"\\s*:\\s*"[0-9]+"', js))
-  if (!length(m)) {
-    stop(
-      "no view count in the page served for ",
-      video_id,
-      " (Youtube answered with something else than the video page)",
-      call. = FALSE
-    )
-  }
-
-  meta <- function(selector) {
-    content <- page |>
-      rvest::html_element(selector) |>
-      rvest::html_attr("content")
-    if (isTRUE(nzchar(content))) content else NA_character_
-  }
-
-  # The date comes as a full timestamp with an offset
-  # ("2025-04-24T22:01:00-07:00"); only the day is of interest here.
-  published <- meta("meta[itemprop='datePublished']")
-  published <- as.Date(substr(published, 1, 10))
-
-  list(
-    title = meta("meta[name='title'], meta[property='og:title']"),
-    published = published,
-    views = as.numeric(gsub("\\D", "", m))
-  )
+    httr2::resp_body_json() |>
+    getElement("items")
 }
 
-# Today's view count of every recorded talk. A video that cannot be read (page
-# gone, private, Youtube serving something unexpected) contributes NA rather
-# than bringing the whole refresh down.
+# Today's view count of every recorded talk. A video that cannot be read (gone,
+# private) is left out of the answer and contributes NA rather than bringing the
+# whole refresh down. A missing key is a misconfiguration rather than a hiccup,
+# so it stops right away instead of silently freezing the collected data.
 .youtube_views_today <- function() {
+  if (!nzchar(Sys.getenv("YOUTUBE_KEY"))) {
+    stop("YOUTUBE_KEY is not set", call. = FALSE)
+  }
   ids <- .lecture_video_ids()
-  details <- lapply(ids, function(id) {
-    message("== youtube views of ", id, " ==")
-    tryCatch(
-      .youtube_video_details(id),
-      error = function(e) {
-        message("   could not be read: ", conditionMessage(e))
-        list(
-          title = NA_character_,
-          published = as.Date(NA),
-          views = NA_real_
-        )
-      }
+  # The API takes up to 50 ids per call.
+  items <- unlist(
+    lapply(split(ids, ceiling(seq_along(ids) / 50)), function(chunk) {
+      message("== youtube views of ", paste(chunk, collapse = ", "), " ==")
+      tryCatch(
+        .youtube_api_videos(chunk),
+        error = function(e) {
+          message("   could not be read: ", conditionMessage(e))
+          NULL
+        }
+      )
+    }),
+    recursive = FALSE
+  )
+
+  details <- items[match(ids, vapply(items, `[[`, character(1), "id"))]
+  # A video missing from the answer, or one hiding a counter, falls back to NA.
+  field <- function(get, empty) {
+    vapply(
+      details,
+      function(x) {
+        value <- if (is.null(x)) NULL else get(x)
+        if (length(value)) value else empty
+      },
+      empty
     )
-  })
+  }
   data.frame(
     video_id = ids,
-    title = vapply(details, `[[`, character(1), "title"),
-    # `vapply()` drops the Date class, hence putting it back explicitly
+    title = field(function(x) x$snippet$title, NA_character_),
+    # The date comes as a full UTC timestamp ("2025-11-21T05:00:13Z"), whereas
+    # the video page dates an upload by Youtube's own Pacific clock. The table
+    # links to that page, and every date collected so far was read off it, so
+    # the day is taken on the same clock rather than on UTC.
     published = as.Date(
-      vapply(details, `[[`, numeric(1), "published"),
-      origin = "1970-01-01"
+      as.POSIXct(
+        field(function(x) x$snippet$publishedAt, NA_character_),
+        format = "%Y-%m-%dT%H:%M:%SZ",
+        tz = "UTC"
+      ),
+      tz = "America/Los_Angeles"
     ),
-    views = vapply(details, `[[`, numeric(1), "views"),
+    views = field(function(x) as.numeric(x$statistics$viewCount), NA_real_),
     checked = Sys.Date(),
     row.names = NULL
   )
