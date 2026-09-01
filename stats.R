@@ -702,6 +702,20 @@ latest_youtube_views <- function() {
   sum(views$views)
 }
 
+# How many people subscribe to the Youtube channel. "data/youtube_channel.rds"
+# holds one measurement per day (see `update_youtube_subscribers()`), so this is
+# the last point of a series rather than a sum over the talks.
+latest_youtube_subscribers <- function() {
+  if (!file.exists("data/youtube_channel.rds")) {
+    return(NA)
+  }
+  stats <- readRDS("data/youtube_channel.rds")
+  if (!NROW(stats)) {
+    return(NA)
+  }
+  stats$subscribers[which.max(stats$date)]
+}
+
 # The same views, but split by talk: one row per recorded talk with its current
 # view count, most watched first.
 latest_youtube_views_by_video <- function() {

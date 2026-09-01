@@ -239,18 +239,17 @@ update_git_history_stats <- function(existing = NULL, pkg) {
   ))
 }
 
-# We just need the video title, its date, and the number of views, all of which
-# the Data API reports for public videos given an API key alone (`YOUTUBE_KEY`);
-# none of this is private user data, so no OAuth is involved. Reading the video
-# page directly works from a desktop but not from CI, where Youtube answers a
-# bot check instead of the page.
-.youtube_api_videos <- function(ids) {
-  httr2::request("https://www.googleapis.com/youtube/v3/videos") |>
-    httr2::req_url_query(
-      part = "snippet,statistics",
-      id = paste(ids, collapse = ","),
-      key = Sys.getenv("YOUTUBE_KEY")
-    ) |>
+# The channel the lecture series is published on.
+.youtube_channel_id <- "UCTzcJ84EF08PZX6VfNDf0Hg"
+
+# We just need the video title, its date, and the number of views, plus how many
+# people subscribe to the channel, all of which the Data API reports publicly
+# given an API key alone (`YOUTUBE_KEY`); none of it is private user data, so no
+# OAuth is involved. Reading the video page directly works from a desktop but
+# not from CI, where Youtube answers a bot check instead of the page.
+.youtube_api <- function(resource, ...) {
+  httr2::request(paste0("https://www.googleapis.com/youtube/v3/", resource)) |>
+    httr2::req_url_query(..., key = Sys.getenv("YOUTUBE_KEY")) |>
     httr2::req_retry(max_tries = 3) |>
     httr2::req_perform() |>
     httr2::resp_body_json() |>
@@ -271,7 +270,11 @@ update_git_history_stats <- function(existing = NULL, pkg) {
     lapply(split(ids, ceiling(seq_along(ids) / 50)), function(chunk) {
       message("== youtube views of ", paste(chunk, collapse = ", "), " ==")
       tryCatch(
-        .youtube_api_videos(chunk),
+        .youtube_api(
+          "videos",
+          part = "snippet,statistics",
+          id = paste(chunk, collapse = ",")
+        ),
         error = function(e) {
           message("   could not be read: ", conditionMessage(e))
           NULL
@@ -352,6 +355,39 @@ update_youtube_views <- function(existing = NULL) {
 
   bind_rows(existing, today) |>
     arrange(published)
+}
+
+# How many people subscribe to the channel. Like the Bluesky counters, and
+# unlike the view counts above, this only says where the channel stands right
+# now, so the history is built one measurement at a time.
+.youtube_subscribers_today <- function() {
+  channel <- .youtube_api(
+    "channels",
+    part = "statistics",
+    id = .youtube_channel_id
+  )
+  data.frame(
+    date = Sys.Date(),
+    subscribers = as.numeric(channel[[1]]$statistics$subscriberCount)
+  )
+}
+
+# A day that was already collected is left alone (the refresh runs every 12
+# hours). A channel that cannot be read leaves the history untouched rather than
+# bringing the whole refresh down.
+update_youtube_subscribers <- function(existing = NULL) {
+  if (Sys.Date() %in% existing$date) {
+    return(existing)
+  }
+  today <- tryCatch(
+    .youtube_subscribers_today(),
+    error = function(e) {
+      message("youtube channel unavailable: ", conditionMessage(e))
+      NULL
+    }
+  )
+  bind_rows(existing, today) |>
+    arrange(date)
 }
 
 ####### Bluesky account of the organisation
@@ -630,6 +666,15 @@ youtube <- update_youtube_views(
 )
 saveRDS(youtube, "data/youtube.rds")
 
+youtube_channel <- update_youtube_subscribers(
+  if (file.exists("data/youtube_channel.rds")) {
+    readRDS("data/youtube_channel.rds")
+  } else {
+    NULL
+  }
+)
+saveRDS(youtube_channel, "data/youtube_channel.rds")
+
 saveRDS(update_lecture_attendance(), "data/lecture_attendance.rds")
 
 bsky <- update_bsky_stats(
@@ -660,6 +705,8 @@ message(
   nrow(revdeps),
   ", youtube=",
   nrow(youtube),
+  ", youtube_channel=",
+  nrow(youtube_channel),
   ", bsky=",
   nrow(bsky),
   ", bsky_posts=",

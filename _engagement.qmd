@@ -84,6 +84,11 @@ vbox(
 )
 ```
 
+```{r}
+#| output: asis
+vbox("Subscribers", "person-plus", latest_youtube_subscribers())
+```
+
 ###### Row
 
 ####### Column
