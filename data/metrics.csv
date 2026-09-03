@@ -73,8 +73,8 @@
 "",2026-07-26,"website_visits",15
 "",2026-07-27,"website_visits",22
 "",2026-07-28,"website_visits",54
-"",2026-07-29,"website_visits",83
-"",2026-07-30,"website_visits",61
+"",2026-07-29,"website_visits",81
+"",2026-07-30,"website_visits",59
 "",2026-07-31,"website_visits",66
 "",2026-08-01,"website_visits",8
 "",2026-08-02,"website_visits",10
@@ -108,7 +108,8 @@
 "",2026-08-30,"website_visits",10
 "",2026-08-31,"website_visits",43
 "",2026-09-01,"website_visits",75
-"",2026-09-02,"website_visits",2
+"",2026-09-02,"website_visits",42
+"",2026-09-03,"website_visits",1
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -363,6 +364,7 @@
 "palaeoverse",2026-08-24,"code_coverage",96.67039
 "palaeoverse",2026-08-25,"code_coverage",96.1152
 "palaeoverse",2026-08-28,"code_coverage",96.1152
+"palaeoverse",2026-09-02,"code_coverage",96.1966
 "palaeoverse",2022-03-11,"commits",4
 "palaeoverse",2022-05-02,"commits",8
 "palaeoverse",2022-05-03,"commits",16
@@ -547,6 +549,7 @@
 "palaeoverse",2026-08-28,"commits",612
 "palaeoverse",2026-09-01,"commits",614
 "palaeoverse",2026-09-02,"commits",620
+"palaeoverse",2026-09-03,"commits",621
 "palaeoverse",2022-03-11,"contributors",1
 "palaeoverse",2022-05-03,"contributors",2
 "palaeoverse",2022-06-21,"contributors",4
@@ -2250,6 +2253,7 @@
 "palaeoverse",2026-08-28,"lines_of_code",8034
 "palaeoverse",2026-09-01,"lines_of_code",8568
 "palaeoverse",2026-09-02,"lines_of_code",8631
+"palaeoverse",2026-09-03,"lines_of_code",8631
 "palaeoverse",2022-03-11,"mean_cyclomatic_complexity",4
 "palaeoverse",2022-05-02,"mean_cyclomatic_complexity",11.6666666666667
 "palaeoverse",2022-05-03,"mean_cyclomatic_complexity",10.5
@@ -2406,6 +2410,7 @@
 "palaeoverse",2026-08-28,"mean_cyclomatic_complexity",35
 "palaeoverse",2026-09-01,"mean_cyclomatic_complexity",23.7209302325581
 "palaeoverse",2026-09-02,"mean_cyclomatic_complexity",21.804347826087
+"palaeoverse",2026-09-03,"mean_cyclomatic_complexity",21.804347826087
 "palaeoverse",2022-06-21,"merged_pull_requests",3
 "palaeoverse",2022-07-15,"merged_pull_requests",5
 "palaeoverse",2022-07-18,"merged_pull_requests",6
@@ -2787,6 +2792,7 @@
 "palaeoverse",2026-08-28,"open_pull_requests",13
 "palaeoverse",2026-09-01,"open_pull_requests",12
 "palaeoverse",2026-09-02,"open_pull_requests",22
+"palaeoverse",2026-09-03,"open_pull_requests",31
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -2899,6 +2905,7 @@
 "palaeoverse",2026-08-28,"pull_requests",167
 "palaeoverse",2026-09-01,"pull_requests",168
 "palaeoverse",2026-09-02,"pull_requests",184
+"palaeoverse",2026-09-03,"pull_requests",193
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
