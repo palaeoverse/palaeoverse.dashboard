@@ -115,7 +115,7 @@
 "",2026-09-02,"website_visits",42
 "",2026-09-03,"website_visits",40
 "",2026-09-04,"website_visits",44
-"",2026-09-05,"website_visits",1
+"",2026-09-05,"website_visits",2
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -2974,6 +2974,7 @@
 "rmacrostrat",2025-11-17,"citations",5
 "rmacrostrat",2026-01-01,"citations",7
 "rmacrostrat",2026-02-01,"citations",8
+"rmacrostrat",2026-09-01,"citations",9
 "rmacrostrat",2025-05-06,"closed_issues",1
 "rmacrostrat",2023-04-25,"code_coverage",86.06249
 "rmacrostrat",2024-05-21,"code_coverage",0
