@@ -26,6 +26,7 @@ Imports:
     maps,
     openalexR,
     reactable,
+    repometrics,
     rmarkdown,
     rvest,
     sf,
@@ -35,6 +36,7 @@ Imports:
 Remotes:
     etiennebacher/cyclocomp@speedup,
     etiennebacher/loc,
+    etiennebacher/repometrics,
     r-lib/gert
 URL: https://github.com/palaeoverse/palaeoverse.dashboard
 BugReports: https://github.com/palaeoverse/palaeoverse.dashboard/issues

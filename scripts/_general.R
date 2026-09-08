@@ -27,7 +27,8 @@ sources <- c(
   "citations",
   "youtube",
   "bsky",
-  "website"
+  "website",
+  "chaoss"
 )
 
 update_statistics <- function(which = sources) {
