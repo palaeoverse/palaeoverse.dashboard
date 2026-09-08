@@ -12,6 +12,10 @@ $bg-dark: mix($brand-light-blue, white, 60%); // more saturated navbar
   position: relative;
 }
 
+.quarto-dashboard #quarto-dashboard-header .navbar .navbar-container {
+  flex-wrap: wrap;
+}
+
 body,
 .bg-light {
   background-color: $bg-light !important;
