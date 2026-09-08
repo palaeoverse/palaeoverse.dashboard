@@ -243,7 +243,22 @@ get_statistics("github_stars", pkg) |>
   e_line(serie = value, name = "Cumulative number") |>
   e_legend(show = FALSE) |>
   e_tooltip(trigger = "axis") |>
-  e_datazoom(type = "slider") |> 
+  e_datazoom(type = "slider") |>
   e_toolbox(show = FALSE) |>
   e_title("Cumulative number of Github stars")
+```
+
+#### CHAOSS metrics
+
+###### Row
+
+```{r}
+#| title: !expr 'title_tip("CHAOSS metrics", "Community health metrics, following the CHAOSS methodology.")'
+chaoss_metrics(pkg) |>
+  e_charts(x = label) |>
+  e_bar(serie = value, name = "Score") |>
+  e_flip_coords() |>
+  e_legend(show = FALSE) |>
+  e_tooltip(trigger = "axis") |>
+  e_toolbox(show = FALSE)
 ```
