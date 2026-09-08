@@ -26,3 +26,11 @@ To add a new package:
 
     {{< include _package.qmd >}}
     ````
+
+### Continuous integration
+
+There are two workflows:
+
+- `refresh-data.yml` adds new data to the metrics stored in `data`.
+
+- `render-dashboard.yml` uses this data to render the dashboard.
