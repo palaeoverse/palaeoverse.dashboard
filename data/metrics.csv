@@ -32,6 +32,7 @@
 "",2026-09-05,"bsky_followers",550
 "",2026-09-06,"bsky_followers",550
 "",2026-09-07,"bsky_followers",551
+"",2026-09-08,"bsky_followers",551
 "",2026-07-30,"bsky_posts",80
 "",2026-07-31,"bsky_posts",80
 "",2026-08-01,"bsky_posts",80
@@ -65,6 +66,7 @@
 "",2026-09-05,"bsky_posts",83
 "",2026-09-06,"bsky_posts",83
 "",2026-09-07,"bsky_posts",83
+"",2026-09-08,"bsky_posts",83
 "",2026-07-13,"website_visits",29
 "",2026-07-14,"website_visits",25
 "",2026-07-15,"website_visits",11
@@ -121,7 +123,8 @@
 "",2026-09-04,"website_visits",44
 "",2026-09-05,"website_visits",15
 "",2026-09-06,"website_visits",13
-"",2026-09-07,"website_visits",2
+"",2026-09-07,"website_visits",25
+"",2026-09-08,"website_visits",2
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -129,6 +132,7 @@
 "",2026-09-05,"youtube_subscribers",214
 "",2026-09-06,"youtube_subscribers",214
 "",2026-09-07,"youtube_subscribers",215
+"",2026-09-08,"youtube_subscribers",215
 "palaeoverse",2022-09-03,"citations",1
 "palaeoverse",2022-10-17,"citations",2
 "palaeoverse",2022-10-31,"citations",3
@@ -568,7 +572,7 @@
 "palaeoverse",2026-09-01,"commits",614
 "palaeoverse",2026-09-02,"commits",620
 "palaeoverse",2026-09-04,"commits",621
-"palaeoverse",2026-09-07,"commits",624
+"palaeoverse",2026-09-07,"commits",627
 "palaeoverse",2022-03-11,"contributors",1
 "palaeoverse",2022-05-03,"contributors",2
 "palaeoverse",2022-06-21,"contributors",4
@@ -1986,8 +1990,9 @@
 "palaeoverse",2026-09-03,"cran_downloads",19894
 "palaeoverse",2026-09-04,"cran_downloads",19907
 "palaeoverse",2026-09-05,"cran_downloads",19933
-"palaeoverse",2026-09-06,"cran_downloads",19933
-"palaeoverse",2026-09-07,"cran_downloads",19933
+"palaeoverse",2026-09-06,"cran_downloads",19952
+"palaeoverse",2026-09-07,"cran_downloads",19952
+"palaeoverse",2026-09-08,"cran_downloads",19952
 "palaeoverse",2022-10-31,"cran_releases",1
 "palaeoverse",2023-01-12,"cran_releases",2
 "palaeoverse",2023-02-16,"cran_releases",3
@@ -2278,7 +2283,7 @@
 "palaeoverse",2026-09-01,"lines_of_code",8568
 "palaeoverse",2026-09-02,"lines_of_code",8631
 "palaeoverse",2026-09-04,"lines_of_code",8639
-"palaeoverse",2026-09-07,"lines_of_code",8603
+"palaeoverse",2026-09-07,"lines_of_code",8549
 "palaeoverse",2022-03-11,"mean_cyclomatic_complexity",4
 "palaeoverse",2022-05-02,"mean_cyclomatic_complexity",11.6666666666667
 "palaeoverse",2022-05-03,"mean_cyclomatic_complexity",10.5
@@ -2436,7 +2441,7 @@
 "palaeoverse",2026-09-01,"mean_cyclomatic_complexity",23.7209302325581
 "palaeoverse",2026-09-02,"mean_cyclomatic_complexity",21.804347826087
 "palaeoverse",2026-09-04,"mean_cyclomatic_complexity",21.8260869565217
-"palaeoverse",2026-09-07,"mean_cyclomatic_complexity",20.3617021276596
+"palaeoverse",2026-09-07,"mean_cyclomatic_complexity",19.2978723404255
 "palaeoverse",2022-06-21,"merged_pull_requests",3
 "palaeoverse",2022-07-15,"merged_pull_requests",5
 "palaeoverse",2022-07-18,"merged_pull_requests",6
@@ -2525,7 +2530,7 @@
 "palaeoverse",2026-09-01,"merged_pull_requests",144
 "palaeoverse",2026-09-02,"merged_pull_requests",150
 "palaeoverse",2026-09-04,"merged_pull_requests",151
-"palaeoverse",2026-09-07,"merged_pull_requests",154
+"palaeoverse",2026-09-07,"merged_pull_requests",157
 "palaeoverse",2022-06-17,"open_issues",2
 "palaeoverse",2022-06-21,"open_issues",3
 "palaeoverse",2022-06-22,"open_issues",3
@@ -2824,7 +2829,7 @@
 "palaeoverse",2026-09-02,"open_pull_requests",22
 "palaeoverse",2026-09-03,"open_pull_requests",34
 "palaeoverse",2026-09-04,"open_pull_requests",33
-"palaeoverse",2026-09-07,"open_pull_requests",30
+"palaeoverse",2026-09-07,"open_pull_requests",29
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -2938,6 +2943,7 @@
 "palaeoverse",2026-09-01,"pull_requests",168
 "palaeoverse",2026-09-02,"pull_requests",184
 "palaeoverse",2026-09-03,"pull_requests",196
+"palaeoverse",2026-09-07,"pull_requests",198
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
@@ -3863,8 +3869,9 @@
 "rmacrostrat",2026-09-03,"cran_downloads",7295
 "rmacrostrat",2026-09-04,"cran_downloads",7312
 "rmacrostrat",2026-09-05,"cran_downloads",7328
-"rmacrostrat",2026-09-06,"cran_downloads",7328
-"rmacrostrat",2026-09-07,"cran_downloads",7328
+"rmacrostrat",2026-09-06,"cran_downloads",7336
+"rmacrostrat",2026-09-07,"cran_downloads",7336
+"rmacrostrat",2026-09-08,"cran_downloads",7336
 "rmacrostrat",2024-07-31,"cran_releases",1
 "rmacrostrat",2024-09-17,"cran_releases",2
 "rmacrostrat",2024-10-18,"cran_releases",3
@@ -7247,8 +7254,9 @@
 "rphylopic",2026-09-03,"cran_downloads",52688
 "rphylopic",2026-09-04,"cran_downloads",52703
 "rphylopic",2026-09-05,"cran_downloads",52776
-"rphylopic",2026-09-06,"cran_downloads",52776
-"rphylopic",2026-09-07,"cran_downloads",52776
+"rphylopic",2026-09-06,"cran_downloads",52791
+"rphylopic",2026-09-07,"cran_downloads",52791
+"rphylopic",2026-09-08,"cran_downloads",52791
 "rphylopic",2018-11-19,"cran_releases",1
 "rphylopic",2020-06-04,"cran_releases",2
 "rphylopic",2023-03-20,"cran_releases",3
@@ -9392,8 +9400,9 @@
 "sepkoski",2026-09-03,"cran_downloads",9155
 "sepkoski",2026-09-04,"cran_downloads",9157
 "sepkoski",2026-09-05,"cran_downloads",9170
-"sepkoski",2026-09-06,"cran_downloads",9170
-"sepkoski",2026-09-07,"cran_downloads",9170
+"sepkoski",2026-09-06,"cran_downloads",9175
+"sepkoski",2026-09-07,"cran_downloads",9175
+"sepkoski",2026-09-08,"cran_downloads",9175
 "sepkoski",2022-11-23,"cran_releases",1
 "sepkoski",2025-02-24,"forks",1
 "sepkoski",2024-08-20,"github_stars",1
