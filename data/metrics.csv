@@ -131,11 +131,11 @@
 "",2026-08-11,"website_visits",37
 "",2026-08-12,"website_visits",39
 "",2026-08-13,"website_visits",30
-"",2026-08-14,"website_visits",62
+"",2026-08-14,"website_visits",61
 "",2026-08-15,"website_visits",22
 "",2026-08-16,"website_visits",9
 "",2026-08-17,"website_visits",95
-"",2026-08-18,"website_visits",59
+"",2026-08-18,"website_visits",58
 "",2026-08-19,"website_visits",66
 "",2026-08-20,"website_visits",86
 "",2026-08-21,"website_visits",44
@@ -171,7 +171,8 @@
 "",2026-09-20,"website_visits",14
 "",2026-09-21,"website_visits",48
 "",2026-09-22,"website_visits",57
-"",2026-09-23,"website_visits",1
+"",2026-09-23,"website_visits",49
+"",2026-09-24,"website_visits",1
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -246,6 +247,7 @@
 "palaeoverse",2026-07-22,"citations",50
 "palaeoverse",2026-09-10,"citations",51
 "palaeoverse",2026-09-16,"citations",52
+"palaeoverse",2026-09-23,"citations",53
 "palaeoverse",2022-06-21,"closed_issues",3
 "palaeoverse",2022-06-22,"closed_issues",4
 "palaeoverse",2022-06-23,"closed_issues",5
@@ -3132,6 +3134,7 @@
 "rmacrostrat",2026-02-01,"citations",8
 "rmacrostrat",2026-09-04,"citations",9
 "rmacrostrat",2026-09-09,"citations",10
+"rmacrostrat",2026-09-23,"citations",11
 "rmacrostrat",2025-05-06,"closed_issues",1
 "rmacrostrat",2023-04-25,"code_coverage",86.06249
 "rmacrostrat",2024-05-21,"code_coverage",0
