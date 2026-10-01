@@ -192,7 +192,8 @@
 "",2026-09-27,"website_visits",18
 "",2026-09-28,"website_visits",39
 "",2026-09-29,"website_visits",39
-"",2026-09-30,"website_visits",5
+"",2026-09-30,"website_visits",47
+"",2026-10-01,"website_visits",3
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -3183,6 +3184,7 @@
 "palaeoverse",2026-07-01,"reverse_dependencies",4
 "palaeoverse",2026-08-01,"reverse_dependencies",4
 "palaeoverse",2026-09-01,"reverse_dependencies",4
+"palaeoverse",2026-10-01,"reverse_dependencies",3
 "rmacrostrat",2024-07-31,"citations",1
 "rmacrostrat",2025-05-01,"citations",2
 "rmacrostrat",2025-08-05,"citations",3
@@ -4288,6 +4290,7 @@
 "rmacrostrat",2026-07-01,"reverse_dependencies",1
 "rmacrostrat",2026-08-01,"reverse_dependencies",1
 "rmacrostrat",2026-09-01,"reverse_dependencies",1
+"rmacrostrat",2026-10-01,"reverse_dependencies",1
 "rphylopic",2018-11-19,"citations",1
 "rphylopic",2024-01-01,"citations",2
 "rphylopic",2024-02-29,"citations",3
@@ -8246,6 +8249,7 @@
 "rphylopic",2026-07-01,"reverse_dependencies",2
 "rphylopic",2026-08-01,"reverse_dependencies",2
 "rphylopic",2026-09-01,"reverse_dependencies",2
+"rphylopic",2026-10-01,"reverse_dependencies",2
 "sepkoski",2024-09-29,"closed_issues",1
 "sepkoski",2022-11-10,"commits",1
 "sepkoski",2022-11-11,"commits",2
@@ -9768,3 +9772,4 @@
 "sepkoski",2026-07-01,"reverse_dependencies",0
 "sepkoski",2026-08-01,"reverse_dependencies",0
 "sepkoski",2026-09-01,"reverse_dependencies",0
+"sepkoski",2026-10-01,"reverse_dependencies",0
