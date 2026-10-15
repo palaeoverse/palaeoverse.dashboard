@@ -75,18 +75,18 @@ vbox("Subscribers", "person-plus", get_latest("youtube_subscribers"))
 
 ```{r}
 # Youtube only reports the views a video has now, so this is a snapshot rather
-# than a series: one point per talk, placed on the day it was published and at
+# than a series: one point per talk, placed on the day it was given and at
 # the number of views it has reached since. Older talks have had longer to
 # gather views, so the trend along the x axis is expected rather than telling.
 views_by_video |>
-  arrange(published) |> 
-  e_charts(x = published) |>
+  arrange(date) |> 
+  e_charts(x = date) |>
   e_line(serie = views, bind = title) |>
   e_scatter(serie = views, bind = title, symbol_size = 12) |>
   e_legend(show = FALSE) |>
   e_tooltip(
     # `bind` above puts the talk in `params.name`; the point itself is
-    # [publication date, views].
+    # [talk date, views].
     formatter = htmlwidgets::JS(
       # `parseFloat` because echarts4r pads the values to a common width
       "function(params) {
@@ -133,10 +133,10 @@ views_by_video |>
       "</a>"
     )
   ) |>
-  select(published, title, views) |>
+  select(date, title, views) |>
   reactable(
     columns = list(
-      published = colDef(name = "Published"),
+      date = colDef(name = "Date"),
       title = colDef(name = "Talk", html = TRUE),
       views = colDef(name = "Views")
     ),

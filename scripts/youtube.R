@@ -12,22 +12,26 @@
   "1-CxROgJQ3MKTpunj429rvh7Q-_XVnnRbK4-HjaNazFI/export?format=csv"
 )
 
-# The video id of every recorded talk. Links are written by hand and some of
+# The video id of every recorded talk, with the day the talk was given (a
+# recording can be uploaded months later). Links are written by hand and some of
 # them carry extra query parameters ("&pp=..."), hence matching the id rather
 # than stripping the prefix.
-.lecture_video_ids <- function() {
-  links <- read.csv(.lecture_sheet_csv)[["Youtube.link"]]
-  links <- links[!is.na(links) & nzchar(links)]
-  unique(regmatches(
-    links,
-    regexpr("(?<=v=)[A-Za-z0-9_-]+", links, perl = TRUE)
-  ))
+.lecture_videos <- function() {
+  sheet <- read.csv(.lecture_sheet_csv)
+  links <- sheet[["Youtube.link"]]
+  pattern <- ".*[?&]v=([A-Za-z0-9_-]+).*"
+  videos <- data.frame(
+    video_id = ifelse(grepl(pattern, links), sub(pattern, "\\1", links), NA),
+    date = as.Date(sheet[["Date"]], format = "%d/%m/%Y")
+  )
+  videos <- videos[!is.na(videos$video_id), , drop = FALSE]
+  videos[!duplicated(videos$video_id), , drop = FALSE]
 }
 
 # The channel the lecture series is published on.
 .youtube_channel_id <- "UCTzcJ84EF08PZX6VfNDf0Hg"
 
-# We just need the video title, its date, and the number of views, plus how many
+# We just need the video title and the number of views, plus how many
 # people subscribe to the channel, all of which the Data API reports publicly
 # given an API key alone (`YOUTUBE_KEY`); none of it is private user data, so no
 # OAuth is involved. Reading the video page directly works from a desktop but
@@ -49,7 +53,8 @@
   if (!nzchar(Sys.getenv("YOUTUBE_KEY"))) {
     stop("YOUTUBE_KEY is not set", call. = FALSE)
   }
-  ids <- .lecture_video_ids()
+  videos <- .lecture_videos()
+  ids <- videos$video_id
   # The API takes up to 50 ids per call.
   items <- unlist(
     lapply(split(ids, ceiling(seq_along(ids) / 50)), function(chunk) {
@@ -84,18 +89,7 @@
   data.frame(
     video_id = ids,
     title = field(function(x) x$snippet$title, NA_character_),
-    # The date comes as a full UTC timestamp ("2025-11-21T05:00:13Z"), whereas
-    # the video page dates an upload by Youtube's own Pacific clock. The table
-    # links to that page, and every date collected so far was read off it, so
-    # the day is taken on the same clock rather than on UTC.
-    published = as.Date(
-      as.POSIXct(
-        field(function(x) x$snippet$publishedAt, NA_character_),
-        format = "%Y-%m-%dT%H:%M:%SZ",
-        tz = "UTC"
-      ),
-      tz = "America/Los_Angeles"
-    ),
+    date = videos$date,
     views = field(function(x) as.numeric(x$statistics$viewCount), NA_real_),
     checked = Sys.Date(),
     row.names = NULL
@@ -119,14 +113,12 @@
       ,
       drop = FALSE
     ]
-    for (column in c("title", "published")) {
-      today[[column]] <- coalesce(today[[column]], previous[[column]])
-    }
+    today$title <- coalesce(today$title, previous$title)
     existing <- existing[!existing$video_id %in% today$video_id, , drop = FALSE]
   }
 
   bind_rows(existing, today) |>
-    arrange(published)
+    arrange(date)
 }
 
 # How many people subscribe to the channel. Unlike the view counts above, this
@@ -187,7 +179,7 @@ youtube_views_by_video <- function() {
   }
   out <- views |>
     mutate(title = sub("^Palaeoverse Lecture Series:\\s*", "", title)) |>
-    select(title, video_id, published, views) |>
+    select(title, video_id, date, views) |>
     arrange(desc(views))
 
   rownames(out) <- NULL
