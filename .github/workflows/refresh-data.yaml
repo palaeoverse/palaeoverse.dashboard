@@ -22,18 +22,18 @@ jobs:
       GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
       YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Add Ubuntu dependencies
         run: sudo apt-get update && sudo apt-get install -y libgit2-dev libcurl4-openssl-dev libgdal-dev libgeos-dev libproj-dev
 
       - name: Set up R
-        uses: r-lib/actions/setup-r@v2
+        uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           use-public-rspm: true
 
       - name: Set up R dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
+        uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
       - name: Refresh data
         run: Rscript -e 'source("scripts/_general.R"); update_statistics()'
