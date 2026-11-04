@@ -21,6 +21,14 @@ Dashboard to follow code activity, code quality, and impact of Palaeoverse packa
     structure of each package page. It is called in `index.qmd`.
   - `_engagement.qmd` contains the content for the "Engagement" tab.
 
+### Continuous integration
+
+There are two workflows:
+
+- `refresh-data.yml` adds new data to the metrics stored in `data`.
+
+- `render-dashboard.yml` uses this data to render the dashboard.
+
 
 ### Adding a new package
 
@@ -113,11 +121,3 @@ of the tab still works.
   ````
 
 Finally, render the dashboard locally (`quarto preview`) to check the new tab.
-
-### Continuous integration
-
-There are two workflows:
-
-- `refresh-data.yml` adds new data to the metrics stored in `data`.
-
-- `render-dashboard.yml` uses this data to render the dashboard.
