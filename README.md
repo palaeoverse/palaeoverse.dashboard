@@ -2,7 +2,8 @@ Dashboard to follow code activity, code quality, and impact of Palaeoverse packa
 
 ### Structure
 
-- `scripts/`: scripts to gather and compute all metrics.
+- `scripts/`: scripts to gather and compute all metrics. See `scripts/README` for
+  more info.
 
 - `data/`: 
   - `.rds` files are metric-based and can be time series (e.g. `citations.rds`, 
