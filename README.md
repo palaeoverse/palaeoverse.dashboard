@@ -1,12 +1,31 @@
 Dashboard to follow code activity, code quality, and impact of Palaeoverse packages.
 
-Scripts for all metrics are in the `scripts` folder.
+### Structure
+
+- `scripts/`: scripts to gather and compute all metrics.
+
+- `data/`: 
+  - `.rds` files are metric-based and can be time series (e.g. `citations.rds`, 
+    `git_history.rds`) or cross-sectional data (e.g. `cran_checks.rds`)
+  - `metrics.csv` compiles the `.rds` files into a single file that users can 
+    download from the dashboard. This is also used to compute the statistics for 
+    each SSI report (see `stats_for_SSI_report.R`).
+
+- the various `qmd` files are used to create the dashboard:
+
+  - `index.qmd` contains the structure of the dashboard. This is also where we define
+    some utility functions and where we create the landing page with package cards and 
+    graphs.
+  - `_package.qmd` is a template page for each package. This is where we define the 
+    structure of each package page. It is called in `index.qmd`.
+  - `_engagement.qmd` contains the content for the "Engagement" tab.
+
 
 ### Adding a new package
 
-Every package tab is built from the same template, `_package.qmd`, so adding a
-package means listing it in a few places. The examples below use a
-hypothetical package called `newpkg`.
+Every package tab is built from the same template, `_package.qmd`, so adding a package 
+means listing it in a few places. The examples below use a hypothetical package called 
+`newpkg`.
 
 #### Requirements
 

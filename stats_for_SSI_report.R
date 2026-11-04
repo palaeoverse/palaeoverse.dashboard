@@ -13,7 +13,7 @@ end_date <- as.Date("2026-07-31")
 # Therefore, we take the values in the 6 months before our interval, make a daily
 # time series, fill missings with the last observation, then restrict to our
 # interval.
-dat <- read_csv("metrics.csv") |>
+dat <- read_csv("data/metrics.csv") |>
   filter(between(date, start_date - month(6), end_date)) |>
   complete(pkg, date, metric) |>
   arrange(pkg, metric, date) |>
