@@ -7,8 +7,9 @@ Dashboard to follow code activity, code quality, and impact of Palaeoverse packa
 - `data/`: 
   - `.rds` files are metric-based and can be time series (e.g. `citations.rds`, 
     `git_history.rds`) or cross-sectional data (e.g. `cran_checks.rds`)
-  - `metrics.csv` compiles the `.rds` files into a single file that users can 
-    download from the dashboard. This is also used to compute the statistics for 
+  - `metrics.csv` compiles the `.rds` files into a single file that various functions
+    then read to get the data they need. This is also the file that users can 
+    download from the dashboard, and it is also used to compute the statistics for 
     each SSI report (see `stats_for_SSI_report.R`).
 
 - the various `qmd` files are used to create the dashboard:
