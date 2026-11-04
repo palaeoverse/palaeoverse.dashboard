@@ -29,6 +29,9 @@ There are two workflows:
 
 - `render-dashboard.yml` uses this data to render the dashboard.
 
+When `refresh-data.yml` completes, it triggers `render-dashboard.yml` but it is also 
+possible to trigger `render-dashboard.yml` manually.
+
 
 ### Adding a new package
 
