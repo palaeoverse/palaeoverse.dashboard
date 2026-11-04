@@ -19,13 +19,13 @@
   Sys.Date() - .goatcounter_days
 }
 
-.goatcounter_get <- function(path, ...) {
+.goatcounter_get <- function(path, limit = 100, ...) {
   httr2::request("https://palaeoverse.goatcounter.com") |>
     httr2::req_url_path_append("api/v0", path) |>
     httr2::req_url_query(
       # The dashboard shows the most visited pages and the countries visitors
       # come from, so the long tail of both is of no use here.
-      limit = 100,
+      limit = limit,
       ...
     ) |>
     httr2::req_auth_bearer_token(Sys.getenv("GOATCOUNTER_TOKEN")) |>
@@ -69,16 +69,16 @@
 
 # Aggregate number of page views per day, since the start
 .goatcounter_count_per_day <- function() {
-  hits <- .goatcounter_get(
-    "stats/hits",
-    # Date when goatcounter was set up
+  stats <- .goatcounter_get(
+    "stats/total",
+    # The total endpoint aggregates all paths, so traffic is not truncated to
+    # the 100 paths returned by stats/hits.
+    limit = NULL,
     start = "2026-07-13",
     end = as.character(Sys.Date())
-  )
+  )$stats
 
-  tibblify::tibblify(hits$hits) |>
-    tidyr::unnest_longer(stats) |>
-    tidyr::unnest_wider(stats) |>
+  tibblify::tibblify(stats) |>
     dplyr::summarize(count = sum(daily), .by = day)
 }
 
