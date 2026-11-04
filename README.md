@@ -33,6 +33,26 @@ There are two workflows:
 When `refresh-data.yml` completes, it triggers `render-dashboard.yml` but it is also 
 possible to trigger `render-dashboard.yml` manually.
 
+### Environment variables and API keys
+
+Rendering the dashboard needs none: it only reads the files in `data/`.
+
+Collecting the data (`update_statistics()`) uses the following environment
+variables. They are all stored in the repository secrets (in the repo settings)
+so that the `refresh-data` workflow can access them.
+
+| Variable            | Used by                  | Needed?                                                                |
+| ------------------- | ------------------------ | ---------------------------------------------------------------------- |
+| `GITHUB_PAT`        | `github.R` (via `gh`)    | Optional, but without it the GitHub API rate limit is quickly reached |
+| `CODECOV_TOKEN`     | `coverage.R`             | Yes, for code coverage                                                 |
+| `GOATCOUNTER_TOKEN` | `website.R`              | Yes, for website visits (token with "read statistics" permission)      |
+| `YOUTUBE_KEY`       | `youtube.R`              | Yes, for Youtube views and subscribers                                 |
+
+The other sources (CRAN, OpenAlex, Bluesky, git clones) use public APIs and
+need no key. If a key is missing or invalid, the corresponding source is skipped
+and the data already stored in `data/` is kept, so the rest of the refresh
+still works.
+
 
 ### Adding a new package
 
