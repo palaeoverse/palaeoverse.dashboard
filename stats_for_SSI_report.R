@@ -1,7 +1,7 @@
 library(tidyverse)
 
-start_date <- as.Date("2026-05-01")
-end_date <- as.Date("2026-07-31")
+start_date <- as.Date("2026-08-01")
+end_date <- as.Date("2026-10-31")
 
 # We have daily time series for some metrics (e.g. CRAN downloads) but not
 # all (e.g. number of commits). If we filter directly on our time interval,
@@ -193,6 +193,20 @@ dat |>
   filter(!is.na(change), change != 0) |>
   str_glue_data(
     "{pkg}: {ifelse(change > 0, '+', '')}{round(change, 1)}% in code coverage"
+  )
+
+### Code coverage
+dat |>
+  filter(metric == "mean_cyclomatic_complexity") |>
+  slice(1, n(), .by = pkg) |>
+  mutate(
+    change = value - lag(value),
+    change_perc = change / lag(value) * 100,
+    .by = pkg
+  ) |>
+  filter(!is.na(change), change != 0) |>
+  str_glue_data(
+    "{pkg}: {ifelse(change > 0, '+', '')}{round(change_perc, 1)}% in average cyclomatic complexity"
   )
 
 ### Contributors
