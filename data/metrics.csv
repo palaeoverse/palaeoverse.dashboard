@@ -327,7 +327,8 @@
 "",2026-11-11,"website_visits",93
 "",2026-11-12,"website_visits",103
 "",2026-11-13,"website_visits",102
-"",2026-11-14,"website_visits",0
+"",2026-11-14,"website_visits",22
+"",2026-11-15,"website_visits",0
 "",2026-09-01,"youtube_subscribers",214
 "",2026-09-02,"youtube_subscribers",214
 "",2026-09-03,"youtube_subscribers",214
@@ -3329,6 +3330,7 @@
 "palaeoverse",2026-10-29,"open_pull_requests",14
 "palaeoverse",2026-11-06,"open_pull_requests",12
 "palaeoverse",2026-11-10,"open_pull_requests",13
+"palaeoverse",2026-11-15,"open_pull_requests",14
 "palaeoverse",2022-06-21,"pull_requests",3
 "palaeoverse",2022-06-27,"pull_requests",4
 "palaeoverse",2022-07-04,"pull_requests",5
@@ -3461,6 +3463,7 @@
 "palaeoverse",2026-10-28,"pull_requests",232
 "palaeoverse",2026-10-29,"pull_requests",233
 "palaeoverse",2026-11-10,"pull_requests",235
+"palaeoverse",2026-11-15,"pull_requests",236
 "palaeoverse",2022-11-01,"reverse_dependencies",0
 "palaeoverse",2022-12-01,"reverse_dependencies",0
 "palaeoverse",2023-01-01,"reverse_dependencies",0
