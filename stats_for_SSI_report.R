@@ -10,11 +10,11 @@ end_date <- as.Date("2026-10-31")
 # Instead, the reference point should be the last observed value in the period
 # before our interval.
 #
-# Therefore, we take the values in the 6 months before our interval, make a daily
+# Therefore, we take all values up to the end of our interval, make a daily
 # time series, fill missings with the last observation, then restrict to our
 # interval.
 dat <- read_csv("data/metrics.csv") |>
-  filter(between(date, start_date - month(6), end_date)) |>
+  filter(date <= end_date) |>
   complete(pkg, date, metric) |>
   arrange(pkg, metric, date) |>
   fill(value, .direction = "down", .by = c(pkg, metric)) |>
@@ -195,7 +195,7 @@ dat |>
     "{pkg}: {ifelse(change > 0, '+', '')}{round(change, 1)}% in code coverage"
   )
 
-### Code coverage
+### Cyclomatic complexity
 dat |>
   filter(metric == "mean_cyclomatic_complexity") |>
   slice(1, n(), .by = pkg) |>
